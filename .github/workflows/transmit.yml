@@ -25,7 +25,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           repository: yuuahp/repo.yuua.dev
-          token: ${{ github.token }}
+          token: ${{ secrets.ActionsToken }}
           path: repository
       - name: ⌛ Cache
         uses: actions/cache@v2
