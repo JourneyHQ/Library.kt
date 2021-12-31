@@ -13,6 +13,8 @@ jobs:
           java-version: "16"
       - name: 🐘 Setup Gradle
         uses: gradle/gradle-build-action@v2
+        with:
+          gradle-version: release-candidate
       - name: 📦 Checkout ${{ github.repository }}
         uses: actions/checkout@v2
         with:
