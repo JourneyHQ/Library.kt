@@ -36,9 +36,10 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: 🗃️ Publish
         run: |
+          mv ./repository/docs/ ./project/artifacts/
           cd ./project
           gradle publish
-          mv -uf ./artifacts/dev ../repository/docs/
+          mv -uf ./artifacts/ ../repository/docs/
           cd ../repository
           git config --global user.name "AutoBuilder"
           git config --global user.email yuuahp@icloud.com
