@@ -1,0 +1,37 @@
+name: 🗃️ Transmit
+
+on: push
+
+jobs:
+  Transmit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📻 SetUp JDK16
+        uses: actions/setup-java@v2.5.0
+        with:
+          java-version: '16'
+      - name: 🐘 Setup Gradle
+        uses: gradle/gradle-build-action@v2
+      - name: 📦 Checkout ${{ github.repository }}
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.repository }}
+          token: ${{ github.token }}
+          path: project
+      - name: 📦 Checkout Repository
+        uses: actions/checkout@v2
+        with:
+          repository: yuuahp/repo.yuua.dev
+          token: ${{ github.token }}
+          path: repository
+      - name: 🗃️ Publish
+        run: |
+          cd ./project
+          gradle publishToMavenLocal
+          cp ./artifacts ../repository/index
+          cd ../repository
+          git config --global user.name "AutoBuilder"
+          git config --global user.email yuuahp@icloud.com
+          git add *
+          git commit -m "add: index(${{ github.repository }})"
+          git push

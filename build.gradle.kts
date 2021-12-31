@@ -41,11 +41,7 @@ publishing {
     repositories {
         maven {
             name = "JourneyLib"
-            url = uri("https://maven.pkg.github.com/yuuahp/JourneyLib")
-            credentials {
-                username = project.findProperty("user") as String? ?: System.getenv("user")
-                password = project.findProperty("token") as String? ?: System.getenv("token")
-            }
+            url = uri("file:/${project.projectDir}/artifacts")
         }
     }
     publications {
