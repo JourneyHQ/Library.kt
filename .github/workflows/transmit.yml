@@ -27,11 +27,17 @@ jobs:
           repository: yuuahp/repo.yuua.dev
           token: ${{ github.token }}
           path: repository
+      - name: ⌛ Cache
+        uses: actions/cache@v2
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: 🗃️ Publish
         run: |
           cd ./project
-          gradle publishToMavenLocal
-          ls
+          gradle publish
           cp ./artifacts ../repository/index
           cd ../repository
           git config --global user.name "AutoBuilder"
