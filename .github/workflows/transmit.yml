@@ -38,7 +38,7 @@ jobs:
         run: |
           cd ./project
           gradle publish
-          mv -uf artifacts ../repository/docs/
+          mv -uf ./artifacts/dev ../repository/docs/
           cd ../repository
           git config --global user.name "AutoBuilder"
           git config --global user.email yuuahp@icloud.com
