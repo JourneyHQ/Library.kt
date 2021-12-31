@@ -31,6 +31,7 @@ jobs:
         run: |
           cd ./project
           gradle publishToMavenLocal
+          ls
           cp ./artifacts ../repository/index
           cd ../repository
           git config --global user.name "AutoBuilder"
