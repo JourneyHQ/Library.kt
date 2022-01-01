@@ -3,3 +3,5 @@ build
 artifacts
 IntelliJTask/Publish.run.xml
 src/main/kotlin/main.kt
+config.prototype.json
+config.json
