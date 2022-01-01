@@ -1,6 +1,6 @@
-package dev.yuua.journeylib
+package dev.yuua.journeylib.commons
 
-import dev.yuua.journeylib.LibTermColor.RESET
+import dev.yuua.journeylib.commons.LibTermColor.RESET
 
 /**
  * ### ログを統一された書式で出力します。

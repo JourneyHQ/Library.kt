@@ -2,3 +2,4 @@
 build
 artifacts
 IntelliJTask/Publish.run.xml
+src/main/kotlin/main.kt
