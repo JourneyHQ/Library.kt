@@ -6,6 +6,8 @@ import java.io.File
 import java.nio.charset.Charset
 import kotlin.system.exitProcess
 
+//todo Javadoc書く
+
 object Config {
     private val libFlow: LibFlow = LibFlow(this.javaClass.simpleName)
     lateinit var config: JSONObject
@@ -101,7 +103,7 @@ object Config {
     }
 
     fun boolean(route: String): Boolean? {
-        return routes[route]?.value as Boolean?
+        return routes[route]?.value.toString().toBooleanStrictOrNull()
     }
 
     fun number(route: String): Number? {
