@@ -30,9 +30,8 @@
     }
     ```
 
-3. 次に、Kotlin,Javaに戻ります。
-   `Config.from()` で読み込み、  
-   `Config[”string.value”]` や `Config.number(”limit”)` などで値を取り出します。  
+3. 次に、Kotlin,Javaに戻ります。  
+   `Config.from()` で読み込み、`Config[”string.value”]` や `Config.number(”limit”)` などで値を取り出します。  
    `optional` かつデフォルト値が設定されていない場合や、デフォルト値の型が設定された型にキャストできない場合のみ `null` が返されます。
 
     ```kotlin
