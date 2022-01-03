@@ -28,6 +28,7 @@ dependencies {
     implementation("args4j:args4j:2.33")
     implementation("net.htmlparser.jericho:jericho-html:3.4")
     implementation("org.jraf:klibnotion:1.10.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
 }
 
 tasks.test {

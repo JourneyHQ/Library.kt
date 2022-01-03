@@ -1,6 +1,6 @@
 package config
 
-import dev.yuua.journeylib.commons.LibFlow
+import universal.LibFlow
 import org.json.JSONObject
 import java.io.File
 import java.nio.charset.Charset

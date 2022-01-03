@@ -1,4 +1,4 @@
-package dev.yuua.journeylib.commons
+package universal
 
 import java.io.File
 import java.io.IOException
@@ -23,6 +23,14 @@ class LibClassFinder {
 
     private fun packageNameToResourceName(packageName: String): String {
         return packageName.replace('.', '/')
+    }
+
+    fun packageExists(packageName: String): Boolean {
+        return try {
+            findClasses(packageName).isNotEmpty()
+        } catch (e: Exception) {
+            false
+        }
     }
 
     @Throws(ClassNotFoundException::class, IOException::class)
