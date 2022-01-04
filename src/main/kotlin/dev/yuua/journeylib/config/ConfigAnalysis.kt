@@ -1,6 +1,6 @@
-package config
+package dev.yuua.journeylib.config
 
-import config.Config.ConfigElement
+import dev.yuua.journeylib.config.Config.ConfigElement
 import org.json.JSONArray
 import org.json.JSONObject
 

@@ -1,4 +1,4 @@
-package universal
+package dev.yuua.journeylib.universal
 
 object LibTermColor {
     // Reset

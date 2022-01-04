@@ -1,4 +1,4 @@
-package config
+package dev.yuua.journeylib.config
 
 import org.json.JSONException
 import org.json.JSONObject

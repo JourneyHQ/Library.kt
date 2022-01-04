@@ -1,4 +1,4 @@
-package universal
+package dev.yuua.journeylib.universal
 
 import java.io.File
 import java.io.IOException

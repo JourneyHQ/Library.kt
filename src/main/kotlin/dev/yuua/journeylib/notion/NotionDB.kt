@@ -1,6 +1,6 @@
-package notion
+package dev.yuua.journeylib.notion
 
-import universal.LibFlow
+import dev.yuua.journeylib.universal.LibFlow
 import kotlinx.coroutines.runBlocking
 import org.jraf.klibnotion.client.Authentication
 import org.jraf.klibnotion.client.ClientConfiguration

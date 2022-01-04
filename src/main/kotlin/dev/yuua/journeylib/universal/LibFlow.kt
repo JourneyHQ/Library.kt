@@ -1,6 +1,6 @@
-package universal
+package dev.yuua.journeylib.universal
 
-import universal.LibTermColor.RESET
+import dev.yuua.journeylib.universal.LibTermColor.RESET
 
 /**
  * ### ログを統一された書式で出力します。
