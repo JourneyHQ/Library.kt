@@ -1,4 +1,4 @@
-package dev.yuua.journeylib.test
+package dev.yuua.journeylib.test.command
 
 import dev.yuua.journeylib.discord.framework.command.CmdExtension.build
 import dev.yuua.journeylib.discord.framework.command.CmdExtension.setCmdFunction
