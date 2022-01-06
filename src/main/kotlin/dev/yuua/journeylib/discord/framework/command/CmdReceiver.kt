@@ -1,5 +1,6 @@
 package dev.yuua.journeylib.discord.framework.command
 
+import dev.yuua.journeylib.discord.framework.scope.CmdScopeManager
 import net.dv8tion.jda.api.EmbedBuilder
 import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -19,14 +20,21 @@ class CmdReceiver : ListenerAdapter() {
             return
         }
 
+        val forbiddenEmbed = EmbedBuilder()
+            .setTitle(":no_entry_sign: ACCESS FORBIDDEN")
+            .setDescription("この操作は許可されていません！")
+            .build()
+
+        val isAllowed = CmdScopeManager.record[cmdIndex.cmdFunction.javaClass.packageName]?.rule?.check(event) ?: true
+
+        if (!isAllowed) {
+            event.replyEmbeds(forbiddenEmbed).queue()
+            return
+        }
+
         for (cmdPermission in cmdIndex.permission)
             if (!cmdPermission.check(event)) {
-                event.replyEmbeds(
-                    EmbedBuilder()
-                        .setTitle(":no_entry_sign: NOT PERMITTED")
-                        .setDescription("この操作は許可されていません！")
-                        .build()
-                ).queue()
+                event.replyEmbeds(forbiddenEmbed).queue()
                 return
             }
 

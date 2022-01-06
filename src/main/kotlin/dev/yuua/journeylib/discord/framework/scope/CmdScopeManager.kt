@@ -8,7 +8,7 @@ object CmdScopeManager {
     interface CmdScope {
         val guilds: Array<String>
 
-        fun rule(rule: (event: SlashCommandEvent) -> Boolean): Boolean = true
+        val rule: CmdScopeRule
     }
 
     val record: HashMap<String, CmdScope> = HashMap()

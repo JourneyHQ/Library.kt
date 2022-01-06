@@ -19,7 +19,6 @@ class CmdRecorder(jda: JDA) {
         }
         libFlow.task("コマンドを登録中...")
 
-        println(FrameworkManager.commandPackage)
         for (commandClass in LibClassFinder().findClasses(FrameworkManager.commandPackage)) {
             if (commandClass.enclosingClass != null
                 || commandClass.name.contains("$")
