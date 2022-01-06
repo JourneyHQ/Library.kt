@@ -83,7 +83,7 @@ object CmdExtension {
         when (cmdType) {
             Cmd -> {
                 CmdRouter.RouteData[CmdRouter.CmdIdentifier(this.name, null, null)] =
-                    CmdRouter.CmdIndex(CmdRouter.FunctionTemp[1], listOfNotNull(CmdRouter.CmdPermissionTemp))
+                    CmdRouter.CmdIndex(CmdRouter.FunctionTemp[0], listOfNotNull(CmdRouter.CmdPermissionTemp))
             }
             CmdSubcmd -> {
                 for ((count, subcommand) in this.subcommands.withIndex()) {
