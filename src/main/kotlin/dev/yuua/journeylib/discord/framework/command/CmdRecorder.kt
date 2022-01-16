@@ -43,6 +43,7 @@ class CmdRecorder(jda: JDA) {
         }
 
         commandList.forEach { (guild, commands) ->
+            guild.loadMembers().get()
             guild.updateCommands().addCommands(commands).queue(
                 {
                     libFlow.success("Guild:${guild.name} への登録に成功しました。(${commands.size})")
