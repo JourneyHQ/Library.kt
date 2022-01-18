@@ -41,7 +41,7 @@ object LibEmbed {
     }
 
     fun success(emoji: String, name: String, message: String): EmbedBuilder {
-        return failure()
+        return success()
             .setTitle("$emoji $name")
             .setDescription(escapeChannelMention(message))
     }
