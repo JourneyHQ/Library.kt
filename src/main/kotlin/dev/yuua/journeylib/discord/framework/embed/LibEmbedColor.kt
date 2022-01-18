@@ -1,4 +1,4 @@
-package dev.yuua.journeylib.discord
+package dev.yuua.journeylib.discord.framework.embed
 
 import java.awt.Color
 
