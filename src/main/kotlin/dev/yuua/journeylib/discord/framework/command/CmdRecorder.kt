@@ -26,7 +26,7 @@ class CmdRecorder(jda: JDA) {
             ) continue
 
             val command: CmdSubstrate = (commandClass.getConstructor().newInstance() as CmdSubstrate)
-            val commandData: CommandData = command.data()
+            val commandData: CommandData = command.data().commandData
 
             val guilds = CmdScopeManager.record[command.javaClass.packageName]?.guilds ?: emptyArray()
             for (guild in (

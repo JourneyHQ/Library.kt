@@ -72,7 +72,7 @@ object CmdExtension {
      * 全てのFunction,権限設定を解析し、RouteDataに登録します。
      * @return CommandData
      */
-    fun CommandData.build(): CommandData {
+    fun CommandData.build(): CmdBuild {
         val cmdType: CmdType = when {
             this.subcommands.isEmpty() && this.subcommandGroups.isEmpty() -> Cmd
             this.subcommands.isNotEmpty() && this.subcommandGroups.isEmpty() -> CmdSubcmd
@@ -130,7 +130,7 @@ object CmdExtension {
 
         CmdRouter.FunctionTemp.clear()
         CmdRouter.permTempClearAll()
-        return this
+        return CmdBuild(this)
     }
 
     /**
