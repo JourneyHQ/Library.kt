@@ -1,5 +1,6 @@
 package dev.yuua.journeylib.test.command
 
+import dev.yuua.journeylib.discord.framework.command.CmdBuild
 import dev.yuua.journeylib.discord.framework.command.CmdExtension.build
 import dev.yuua.journeylib.discord.framework.command.CmdExtension.setCmdFunction
 import dev.yuua.journeylib.discord.framework.command.CmdExtension.setPermission
@@ -12,22 +13,9 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData
 
 class ping : CmdSubstrate {
-    override fun data(): CommandData = CommandData("powa", "powa!")
-        .addSubcommandGroups(
-            SubcommandGroupData("powagroup", "powa!")
-                .addSubcommands(
-                    SubcommandData("powasub", "powasub!")
-                        .setCmdFunction(this::sample)
-                        .setPermission { true }
-                ),
-            SubcommandGroupData("notpowagroup", "powa!")
-                .addSubcommands(
-                    SubcommandData("notpowasub", "powasub!")
-                        .setCmdFunction(this::sample),
-                    SubcommandData("powasub", "powasub!")
-                        .setCmdFunction(this::sample)
-                ),
-        ).build()
+    override fun data(): CmdBuild = CommandData("powa", "powa!")
+        .setCmdFunction(this::sample)
+        .build()
 
     private fun sample(
         jda: JDA, guild: Guild?, isFromGuild: Boolean,
