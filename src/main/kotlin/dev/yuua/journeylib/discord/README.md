@@ -1,5 +1,3 @@
-# Framework 
-
 # Discord Framework
 
 > パッケージ毎にコマンド/イベントのクラスを読み込み、 
