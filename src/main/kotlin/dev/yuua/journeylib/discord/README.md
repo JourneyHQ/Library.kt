@@ -10,10 +10,10 @@
 
 ```kotlin 
 val jda = FrameworkManager 
-.setJDABuilder(jdaBuilder) //JDABuilderをここに 
-.initCmdManager("dev.yuua.testbot.function.command") 
-.initEventManager("dev.yuua.testbot.function.event") 
-.build() 
+    .setJDABuilder(jdaBuilder) //JDABuilderをここに 
+    .initCmdManager("dev.yuua.testbot.function.command") 
+    .initEventManager("dev.yuua.testbot.function.event") 
+    .build() 
 ``` 
 
 2. 完成です。 
@@ -24,18 +24,18 @@ val jda = FrameworkManager
 
 ```kotlin 
 class ping : CmdSubstrate { 
-override fun data(): CmdBuild = CommandData("ping", "reply pong!") 
-.setCmdFunction(this::replyPong) 
-.build() 
+    override fun data(): CmdBuild = CommandData("ping", "reply pong!") 
+        .setCmdFunction(this::replyPong) 
+        .build() 
 
-private fun replyPong( 
-jda: JDA, guild: Guild?, isFromGuild: Boolean, 
-channel: MessageChannel, type: ChannelType, 
-member: Member?, user: User, 
-event: SlashCommandEvent 
-) { 
-event.reply("Pong!!!!!!!").setEphemeral(true).queue() 
-} 
+    private fun replyPong( 
+        jda: JDA, guild: Guild?, isFromGuild: Boolean, 
+        channel: MessageChannel, type: ChannelType, 
+        member: Member?, user: User, 
+        event: SlashCommandEvent 
+    ) { 
+        event.reply("Pong!!!!!!!").setEphemeral(true).queue() 
+    } 
 } 
 ``` 
 
