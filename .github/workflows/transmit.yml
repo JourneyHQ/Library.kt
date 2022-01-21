@@ -6,9 +6,6 @@ jobs:
   Transmit:
     runs-on: ubuntu-latest
     steps:
-      - name: Log Event (test)
-        run: |
-          echo "${{toJSON(github.event)}}"
       - name: 📻 SetUp JDK16
         uses: actions/setup-java@v2.5.0
         with:
