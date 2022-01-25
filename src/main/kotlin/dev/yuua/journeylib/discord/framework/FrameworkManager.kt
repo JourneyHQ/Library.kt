@@ -20,7 +20,7 @@ object FrameworkManager {
     }
 
     fun initEventManager(eventPackage: String): FrameworkManager {
-        if (LibClassFinder().findClasses(eventPackage).isEmpty())
+        if (LibClassFinder().find(eventPackage).isEmpty())
             throw UnsupportedOperationException("Package:$eventPackage が空か、見つかりませんでした。")
         this.eventPackage = eventPackage
 
@@ -29,7 +29,7 @@ object FrameworkManager {
     }
 
     fun initCmdManager(commandPackage: String): FrameworkManager {
-        if (LibClassFinder().findClasses(commandPackage).isEmpty())
+        if (LibClassFinder().find(commandPackage).isEmpty())
             throw UnsupportedOperationException("Package:$commandPackage が空か、見つかりませんでした。")
         this.commandPackage = commandPackage
 

@@ -2,7 +2,6 @@ package dev.yuua.journeylib.discord.framework.scope
 
 import dev.yuua.journeylib.discord.framework.FrameworkManager
 import dev.yuua.journeylib.universal.LibClassFinder
-import net.dv8tion.jda.api.events.interaction.SlashCommandEvent
 
 object CmdScopeManager {
     interface CmdScope {
@@ -14,7 +13,7 @@ object CmdScopeManager {
     val record: HashMap<String, CmdScope> = HashMap()
 
     fun init() {
-        for (scopeClass in LibClassFinder().findClasses(FrameworkManager.commandPackage)) {
+        for (scopeClass in LibClassFinder().find(FrameworkManager.commandPackage)) {
             if (scopeClass.enclosingClass != null
                 || scopeClass.name.contains("$") ||
                 !scopeClass.simpleName.equals("Scope")

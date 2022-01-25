@@ -13,7 +13,7 @@ class EventRecorder(jdaBuilder: JDABuilder) {
     init {
         libFlow.task("イベントを登録中...")
 
-        for (eventClass in LibClassFinder().findClasses(FrameworkManager.eventPackage)) {
+        for (eventClass in LibClassFinder().find(FrameworkManager.eventPackage)) {
             if (eventClass.enclosingClass != null || eventClass.name.contains("$")) continue
 
             val instance = (eventClass.getConstructor() as Constructor<*>).newInstance()
