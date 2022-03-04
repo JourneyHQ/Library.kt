@@ -43,7 +43,7 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: 🗃️ Publish
         env:
-          journeylib_version: "${{ steps.tag_version.outputs.new_version }}"
+          journeylib_version: ${{ steps.tag_version.outputs.new_version }}
         run: |
           mv ./repository/docs/ ./project/artifacts/
           cd ./project

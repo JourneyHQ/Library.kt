@@ -5,7 +5,6 @@ plugins {
     `maven-publish`
 }
 
-val name = "JourneyLib"
 group = "dev.yuua"
 
 repositories {
@@ -42,14 +41,14 @@ tasks.withType<KotlinCompile> {
 publishing {
     repositories {
         maven {
-            name = name
+            name = "JourneyLib"
             url = uri("file:/${project.projectDir}/artifacts")
         }
     }
     publications {
         register<MavenPublication>("gpr") {
-            artifactId = name.toLowerCase()
-            version = System.getenv("${name.toLowerCase()}_version") ?: "${artifacts.hashCode()}_local"
+            artifactId = "journeylib"
+            version = System.getenv("journeylib_version") ?: "${artifacts.hashCode()}_local"
             from(components["java"])
         }
     }
