@@ -42,10 +42,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: 🗃️ Publish
+        env:
+          journeylib_version: "${{ steps.tag_version.outputs.new_version }}"
         run: |
           mv ./repository/docs/ ./project/artifacts/
           cd ./project
-          journeylib_version = "${{ steps.tag_version.outputs.new_version }}"
           gradle publish
           mv -uf ./artifacts/ ../repository/docs/
           cd ../repository
