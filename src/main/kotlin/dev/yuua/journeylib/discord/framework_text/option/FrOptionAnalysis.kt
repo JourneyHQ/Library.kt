@@ -44,7 +44,7 @@ object FrOptionAnalysis {
                     continue
                 }
             }
-            FrOption().fromData(name,null,value)
+            //FrOption().fromData(name,null,value)
         }
         return emptyList<FrOption>().toMutableList()
     }
