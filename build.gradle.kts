@@ -7,7 +7,6 @@ plugins {
 
 val name = "JourneyLib"
 group = "dev.yuua"
-version = System.getenv("${name.toLowerCase()}_version") ?: "${artifacts.hashCode()}_local"
 
 repositories {
     mavenCentral()
@@ -50,7 +49,7 @@ publishing {
     publications {
         register<MavenPublication>("gpr") {
             artifactId = name.toLowerCase()
-            version = version
+            version = System.getenv("${name.toLowerCase()}_version") ?: "${artifacts.hashCode()}_local"
             from(components["java"])
         }
     }
