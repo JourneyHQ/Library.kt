@@ -6,6 +6,7 @@ plugins {
 }
 
 group = "dev.yuua"
+version = System.getenv("journeylib_version") ?: "${artifacts.hashCode()}_local"
 
 repositories {
     mavenCentral()
@@ -48,7 +49,6 @@ publishing {
     publications {
         register<MavenPublication>("gpr") {
             artifactId = "journeylib"
-            version = System.getenv("journeylib_version") ?: "${artifacts.hashCode()}_local"
             from(components["java"])
         }
     }
