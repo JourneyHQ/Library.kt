@@ -43,13 +43,14 @@ tasks.withType<KotlinCompile> {
 publishing {
     repositories {
         maven {
-            name = this.name
+            name = name
             url = uri("file:/${project.projectDir}/artifacts")
         }
     }
     publications {
         register<MavenPublication>("gpr") {
-            artifactId = this.name.toLowerCase()
+            artifactId = name.toLowerCase()
+            version = version
             from(components["java"])
         }
     }
