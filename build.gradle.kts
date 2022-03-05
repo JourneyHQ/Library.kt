@@ -19,7 +19,7 @@ dependencies {
     testImplementation(kotlin("test"))
     implementation("ch.qos.logback:logback-classic:1.3.0-alpha10")
     implementation("net.dv8tion:JDA:5.0.0-alpha.2")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.5")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
     implementation("org.json:json:20211205")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
