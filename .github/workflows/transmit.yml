@@ -26,13 +26,13 @@ jobs:
         with:
           gradle-version: release-candidate
       - name: 📦 Checkout ${{ github.repository }}
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: ${{ github.repository }}
           token: ${{ github.token }}
           path: project
       - name: 📦 Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           repository: yuuahp/repo.yuua.dev
           token: ${{ secrets.ActionsToken }}
