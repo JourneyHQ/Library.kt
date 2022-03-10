@@ -64,4 +64,4 @@ jobs:
           webhook: ${{ secrets.DISCORD_NOTIFY }}
           title: "☕ JourneyLib v${{ steps.version.outputs.new_version }}"
           description: "`implementation(\"dev.yuua:journeylib:${{ steps.version.outputs.new_version }}\")`"
-          color: eaa6e9
+          color: 0xeaa6e9
