@@ -59,3 +59,9 @@ jobs:
           git add *
           git commit -m "add: index(${{ github.repository }})"
           git push
+      - uses: sarisia/actions-status-discord@v1
+        with:
+          webhook: ${{ secrets.DISCORD_NOTIFY }}
+          title: "☕ JourneyLib v${{ steps.version.outputs.new_version }}"
+          description: "`implementation(\"dev.yuua:journeylib:${{ steps.version.outputs.new_version }}\")`"
+          color: eaa6e9
