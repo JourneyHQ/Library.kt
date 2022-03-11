@@ -6,7 +6,10 @@ plugins {
 }
 
 group = "dev.yuua"
-version = System.getenv("journeylib_version") ?: "${artifacts.hashCode()}_local"
+version = when (System.getenv("platform")) {
+    "actions" -> System.getenv("project_version") ?: "${artifacts.hashCode()}_actions"
+    else -> "${artifacts.hashCode()}_local"
+}
 
 repositories {
     mavenCentral()
