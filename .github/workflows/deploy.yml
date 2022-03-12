@@ -1,9 +1,10 @@
-name: 🗃️ Transmit
+name: 🗃️ Deploy
 
 on:
   push:
     branches:
       - main
+      - dev
 
 jobs:
   Transmit:
@@ -33,7 +34,7 @@ jobs:
           title: "Started: ☕ ${{ env.name }} v${{ steps.version.outputs.new_version }}"
           description: "[${{ github.workflow }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           color: 0xeaa6e9
-      - name: 📻 SetUp JDK16
+      - name: 📻 Setup JDK16
         uses: actions/setup-java@v3.0.0
         with:
           distribution: "zulu"
@@ -61,7 +62,7 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - name: 🗃️ Publish
+      - name: 🗃️ Deploy
         env:
           project_version: ${{ steps.version.outputs.new_version }}
         run: |
@@ -74,11 +75,14 @@ jobs:
           git config --global user.name "AutoBuilder"
           git config --global user.email yuuahp@icloud.com
           git add *
-          git commit -m "add: index(${{ github.repository }})"
+          git commit -m "add: ${{ env.name }} v${{ env.project_version }} ☕"
           git push
-      - uses: sarisia/actions-status-discord@v1
+      - name: 🛰️ End Notification
+        uses: sarisia/actions-status-discord@v1
+        env:
+          project_version: ${{ steps.version.outputs.new_version }}
         with:
           webhook: ${{ secrets.DISCORD_NOTIFY }}
-          title: "☕ ${{ env.name }} v${{ steps.version.outputs.new_version }}"
-          description: "`implementation(\"${{ env.rdns }}:${{ steps.name.outputs.lowercase }}:${{ steps.version.outputs.new_version }}\")`"
+          title: "☕ ${{ env.name }} v${{ env.project_version }}"
+          description: "`implementation(\"${{ env.rdns }}:${{ steps.name.outputs.lowercase }}:${{ env.project_version }}\")`"
           color: 0xeaa6e9
