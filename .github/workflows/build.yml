@@ -7,13 +7,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: 🛰️ Start Notification
-          uses: sarisia/actions-status-discord@v1
-          with:
-            nodetail: true
-            webhook: ${{ secrets.DISCORD_NOTIFY }}
-            title: "Started: ☕ ${{ env.name }} v${{ steps.version.outputs.new_version }}"
-            description: "[${{ github.workflow }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
-            color: 0xeaa6e9
+        uses: sarisia/actions-status-discord@v1
+        with:
+          nodetail: true
+          webhook: ${{ secrets.DISCORD_NOTIFY }}
+          title: "Started: ☕ ${{ env.name }} v${{ steps.version.outputs.new_version }}"
+          description: "[${{ github.workflow }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
+          color: 0xeaa6e9
       - name: 📻 Setup JDK16
         uses: actions/setup-java@v3.0.0
         with:
