@@ -16,22 +16,31 @@ repositories {
     maven(url = "https://m2.dv8tion.net/releases")
     maven(url = "https://oss.sonatype.org/content/groups/public/")
     maven(url = "https://repo.tomacheese.com")
+    maven {
+        url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
+        name = "ktor-eap"
+    }
 }
 
 dependencies {
     testImplementation(kotlin("test"))
-    implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
-    implementation("net.dv8tion:JDA:5.0.0-alpha.2")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.5")
+
+    implementation("net.dv8tion:JDA:5.0.0-alpha.9")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
-    implementation("org.json:json:20211205")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
-    implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("com.vdurmont:emoji-java:5.1.1")
+
+    implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
+    implementation("org.json:json:20211205")
+    implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("args4j:args4j:2.33")
     implementation("net.htmlparser.jericho:jericho-html:3.4")
-    implementation("org.jraf:klibnotion:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.reflections:reflections:0.10.2")
+
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.5")
+    implementation("org.jraf:klibnotion:1.11.0")
+
 }
 
 tasks.test {
@@ -55,4 +64,9 @@ publishing {
             from(components["java"])
         }
     }
+}
+
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.kotlinOptions {
+    languageVersion = "1.6"
 }

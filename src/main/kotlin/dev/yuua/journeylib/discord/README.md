@@ -32,7 +32,7 @@ class ping : CmdSubstrate {
         jda: JDA, guild: Guild?, isFromGuild: Boolean, 
         channel: MessageChannel, type: ChannelType, 
         member: Member?, user: User, 
-        event: SlashCommandEvent 
+        event: SlashCommandInteractionEvent 
     ) { 
         event.reply("Pong!!!!!!!").setEphemeral(true).queue() 
     } 

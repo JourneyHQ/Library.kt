@@ -4,6 +4,10 @@ on: pull_request
 
 jobs:
   Build:
+    env:
+      rdns: dev.yuua
+      name: JourneyLib
+      platform: actions
     runs-on: ubuntu-latest
     steps:
       - name: 🛰️ Start Notification
@@ -11,7 +15,7 @@ jobs:
         with:
           nodetail: true
           webhook: ${{ secrets.DISCORD_NOTIFY }}
-          title: "Started: ☕ ${{ env.name }} v${{ steps.version.outputs.new_version }}"
+          title: "Started: ☕ ${{ env.name }} Test Build"
           description: "[${{ github.workflow }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           color: 0xeaa6e9
       - name: 📻 Setup JDK16
@@ -42,10 +46,7 @@ jobs:
           gradle build
       - name: 🛰️ End Notification
         uses: sarisia/actions-status-discord@v1
-        env:
-          project_version: ${{ steps.version.outputs.new_version }}
         with:
           webhook: ${{ secrets.DISCORD_NOTIFY }}
-          title: "☕ ${{ env.name }} v${{ env.project_version }}"
-          description: "`implementation(\"${{ env.rdns }}:${{ steps.name.outputs.lowercase }}:${{ env.project_version }}\")`"
+          title: "☕ ${{ env.name }} Test Build"
           color: 0xeaa6e9

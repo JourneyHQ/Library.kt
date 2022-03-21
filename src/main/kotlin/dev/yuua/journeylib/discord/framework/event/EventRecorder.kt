@@ -1,7 +1,6 @@
 package dev.yuua.journeylib.discord.framework.event
 
 import dev.yuua.journeylib.discord.framework.FrameworkManager
-import dev.yuua.journeylib.universal.LibClassFinder
 import dev.yuua.journeylib.universal.LibFlow
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.hooks.ListenerAdapter
@@ -13,7 +12,7 @@ class EventRecorder(jdaBuilder: JDABuilder) {
     init {
         libFlow.task("イベントを登録中...")
 
-        for (eventClass in LibClassFinder().find(FrameworkManager.eventPackage)) {
+        for (eventClass in FrameworkManager.getEventClasses()) {
             if (eventClass.enclosingClass != null || eventClass.name.contains("$")) continue
 
             val instance = (eventClass.getConstructor() as Constructor<*>).newInstance()
