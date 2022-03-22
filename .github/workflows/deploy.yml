@@ -21,7 +21,7 @@ jobs:
           string: ${{ env.name }}
       - name: 👉 Release Version
         id: version
-        uses: yuuahp/github-tag-action@main
+        uses: yuuahp/github-tag-action@v6.1
         with:
           dry_run: true
           github_token: ${{ github.token }}
