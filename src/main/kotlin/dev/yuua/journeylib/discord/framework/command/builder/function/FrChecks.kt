@@ -4,5 +4,5 @@ import dev.yuua.journeylib.discord.framework.command.event.FrCmdEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
 fun interface FrChecks {
-    fun check(event: SlashCommandInteractionEvent): CheckResult
+    fun check(event: FrCmdEvent): CheckResult
 }

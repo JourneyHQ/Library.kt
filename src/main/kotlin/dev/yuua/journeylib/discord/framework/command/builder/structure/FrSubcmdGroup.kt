@@ -3,7 +3,7 @@ package dev.yuua.journeylib.discord.framework.command.builder.structure
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecks
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData
 
-class FrSubcmdGroup(val name: String, val details: String) {
+class FrSubcmdGroup(val name: String, val details: String, vararg val alias: String) {
 
     val jdaSubcmdGroupData = SubcommandGroupData(name, details)
 

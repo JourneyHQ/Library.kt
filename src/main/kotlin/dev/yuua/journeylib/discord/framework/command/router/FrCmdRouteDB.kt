@@ -4,17 +4,17 @@ object FrCmdRouteDB {
     val record = mutableListOf<FrCmdRouteRecord>()
 
     fun find(cmd: String, subcmdGroup: String?, subcmd: String?): FrCmdRouteRecord {
-        println(cmd)
-        println(subcmdGroup)
-        println(subcmd)
-        record.forEach {
-            println(it)
-        }
         return record.filter {
-            it.cmd == cmd && it.subcmdGroup == subcmdGroup && it.subcmd == subcmd
+            it.cmd.allNames().contains(cmd) &&
+                    it.subcmdGroup.allNames().contains(subcmdGroup) &&
+                    it.subcmd.allNames().contains(subcmd)
         }.also {
             if (it.size != 1)
-                throw IllegalStateException("条件に一致するレコードが ${it.size} 個見つかりました！")
+                throw IllegalStateException("${it.size} record(s) were found that match the criteria!")
         }.first()
+    }
+
+    fun findStruct(cmd: String): FrCmdStruct {
+        return record.first { it.cmd.allNames().contains(cmd) }.struct
     }
 }

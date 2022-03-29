@@ -1,38 +1,30 @@
 package dev.yuua.journeylib.discord.framework.command.builder.option
 
-import dev.yuua.journeylib.discord.framework.command.builder.option.type.MainType
 import dev.yuua.journeylib.universal.LibString.removeQuote
-import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 /**
  * ### オプションを解析します
- * ex: option1:"value2" option2='value2' value3
+ * ex: option1=value2 option2="value 2" value3 "value 4"
  */
 object FrOptionLib {
-    fun OptionType.toFrOptionType(): MainType {
-        return MainType.valueOf(this.name)
+    enum class OptionAnalysisResultType(val code: String) {
+        RequiredNotFound("Required Options Not Found"),
+        MixedOption("Mixed Option Syntax"),
+        Success("")
     }
 
-    fun MainType.toJDAOptionType(): OptionType {
-        return OptionType.valueOf(this.name)
-    }
+    data class OptionAnalysisResult(
+        val options: MutableList<FrOptionIndex>,
+        val message: String,
+        val type: OptionAnalysisResultType
+    )
 
-    fun FrOption.toJDAOptionData(): OptionData {
-        return OptionData(
-            this.mainType.toJDAOptionType(),
-            this.name,
-            this.details,
-            this.required,
-            this.autoComplete
-        )
-    }
-
-    fun analyze(text: String): MutableList<FrOptionIndex> {
+    fun analyze(text: String, frOptions: MutableList<OptionData>): OptionAnalysisResult {
         val optionNameRegex = Regex("[\\w-]{1,32}")
 
         //value
-        val optionRegex = Regex("[\\w-]+")
+        val optionRegex = Regex(".+")
         //"value"
         val optionWithQuoteRegex = Regex("\"(?:[^\\\\\"]|\\\\\\\\|\\\\\")*\"")
         //option=value
@@ -40,33 +32,80 @@ object FrOptionLib {
         //option="value"
         val namedOptionWithQuoteRegex = Regex("($optionNameRegex)=($optionWithQuoteRegex)")
 
-        val options = mutableListOf<FrOptionIndex>()
 
-        for ((index, group) in Regex("($namedOptionWithQuoteRegex)|($namedOptionRegex)|($optionRegex)|($optionWithQuoteRegex)")
-            .findAll(text).withIndex()) {
-            val option = group.value
-            //todo もうちょっと同じ処理をまとめたい
-            val (name: String, value: String) = when {
-                option.matches(namedOptionWithQuoteRegex) -> {
-                    val splitOption = option.split("=")
-                    splitOption[0] to splitOption[1].removeQuote()
+        val allRegex = Regex("($namedOptionWithQuoteRegex)|($namedOptionRegex)|($optionWithQuoteRegex)|($optionRegex)")
+
+        data class NamedOption(val index: Number, val name: String, val value: Any)
+
+        val namedOptions = mutableListOf<NamedOption>()
+        val indexedOptions = mutableListOf<NamedOption>()
+
+        for ((index, group) in allRegex.findAll(text).withIndex()) {
+            val optionText = group.value
+            when {
+                optionText.matches(namedOptionWithQuoteRegex) || optionText.matches(namedOptionRegex) -> {
+                    val splitOption = optionText.split("=")
+                    namedOptions.add(NamedOption(index, splitOption[0], splitOption[1].removeQuote()))
                 }
-                option.matches(namedOptionRegex) -> {
-                    val splitOption = option.split("=")
-                    splitOption[0] to splitOption[1]
+                optionText.matches(optionWithQuoteRegex) || optionText.matches(optionRegex) -> {
+                    index.toString() to optionText.removeQuote()
+                    indexedOptions.add(NamedOption(index, index.toString(), optionText.removeQuote()))
                 }
-                option.matches(optionWithQuoteRegex) -> {
-                    index.toString() to option.removeQuote()
-                }
-                option.matches(optionRegex) -> {
-                    index.toString() to option
-                }
-                else -> {
-                    continue
+                //通常発生しない...?
+                else -> throw IllegalArgumentException("$index does not match any of the types!")
+            }
+        }
+
+        val options = mutableListOf<FrOptionIndex>()
+        val frOptionsClone = mutableListOf(*frOptions.toTypedArray())
+        when {
+            //namedOptions
+            namedOptions.isNotEmpty() && indexedOptions.isEmpty() -> {
+                for (namedOption in namedOptions) {
+                    val frOption = frOptionsClone.first { it.name == namedOption.name }
+                    options.add(
+                        FrOptionIndex().fromData(
+                            frOption.name,
+                            namedOption.value,
+                            frOption.type
+                        )
+                    )
+                    frOptionsClone.remove(frOption)
                 }
             }
-            //FrOption().fromData(name,null,value)
+            //indexedOptions
+            namedOptions.isEmpty() && indexedOptions.isNotEmpty() -> {
+
+                for ((index, indexedOption) in indexedOptions.withIndex()) {
+                    val frOption = frOptionsClone[index]
+                    options.add(
+                        FrOptionIndex().fromData(
+                            frOption.name,
+                            indexedOption.value,
+                            frOption.type
+                        )
+                    )
+                    frOptionsClone.remove(frOption)
+                }
+            }
+            namedOptions.isNotEmpty() && indexedOptions.isNotEmpty() ->
+                return OptionAnalysisResult(
+                    mutableListOf(),
+                    "Mixed option syntax found.\nPlease use consistent syntax.",
+                    OptionAnalysisResultType.MixedOption
+                )
         }
-        return emptyList<FrOptionIndex>().toMutableList()
+
+        val requiredOptions = frOptionsClone.filter { it.isRequired }
+        val requiredOptionsString = requiredOptions.joinToString(",") { it.name }
+
+        if (requiredOptions.isNotEmpty())
+            return OptionAnalysisResult(
+                mutableListOf(),
+                "Required option: $requiredOptionsString not found.\nPlease refer to help.",
+                OptionAnalysisResultType.RequiredNotFound
+            )
+
+        return OptionAnalysisResult(options, "", OptionAnalysisResultType.Success)
     }
 }

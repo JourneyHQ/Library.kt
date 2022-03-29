@@ -1,27 +1,48 @@
 package dev.yuua.journeylib.discord.framework.command.builder.structure
 
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecks
-import dev.yuua.journeylib.discord.framework.command.builder.function.FrFunction
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrSlashFunction
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrTextFunction
 import dev.yuua.journeylib.discord.framework.command.builder.option.FrOption
-import dev.yuua.journeylib.discord.framework.command.builder.option.FrOptionLib.toJDAOptionData
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 
-class FrSubcmd(val name: String, val details: String) {
+class FrSubcmd(val name: String, val details: String, vararg val alias: String) {
 
     val jdaSubcmdData = SubcommandData(name, details)
 
-    lateinit var function: FrFunction
-    val options = mutableListOf<FrOption>()
+    var function: FrSlashFunction? = null
+    var textFunction: FrTextFunction? = null
+    val options = mutableListOf<OptionData>()
     lateinit var checks: FrChecks
 
-    fun addOption(vararg options: FrOption): FrSubcmd {
+    fun addOptions(vararg options: OptionData): FrSubcmd {
         this.options.addAll(options)
-        jdaSubcmdData.addOptions(options.map { it.toJDAOptionData() })
+        jdaSubcmdData.addOptions(*options)
         return this
     }
 
-    fun setFunction(function: FrFunction): FrSubcmd {
+    inline fun <reified T> addOption(
+        name: String,
+        details: String,
+        required: Boolean = false,
+        autoComplete: Boolean = false,
+        builder: OptionData.() -> Unit = {}
+    ): FrSubcmd {
+        val option = FrOption<T>(name, details, required, autoComplete, builder)
+        this.options.add(option)
+        jdaSubcmdData.addOptions(option)
+        return this
+    }
+
+
+    fun setFunction(function: FrSlashFunction): FrSubcmd {
         this.function = function
+        return this
+    }
+
+    fun setFunction(function: FrTextFunction): FrSubcmd {
+        this.textFunction = function
         return this
     }
 

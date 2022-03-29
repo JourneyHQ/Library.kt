@@ -1,14 +1,15 @@
 package dev.yuua.journeylib.discord.framework.command.builder.structure
 
-import dev.yuua.journeylib.discord.framework.command.router.FrCmdStruct.*
-import dev.yuua.journeylib.discord.framework.command.router.FrCmdRouteRecord
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecks
-import dev.yuua.journeylib.discord.framework.command.builder.function.FrFunction
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrSlashFunction
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrTextFunction
 import dev.yuua.journeylib.discord.framework.command.builder.option.FrOption
-import dev.yuua.journeylib.discord.framework.command.builder.option.FrOptionLib.toJDAOptionData
+import dev.yuua.journeylib.discord.framework.command.router.FrCmdRouteRecord
+import dev.yuua.journeylib.discord.framework.command.router.FrCmdStruct.*
 import net.dv8tion.jda.api.interactions.commands.build.Commands
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
-class FrCmd(val name: String, val details: String) {
+class FrCmd(val name: String, val details: String, vararg val alias: String) {
     var build = false
     var cmdStruct = Cmd
 
@@ -16,8 +17,9 @@ class FrCmd(val name: String, val details: String) {
 
     val routes = mutableListOf<FrCmdRouteRecord>()
 
-    lateinit var function: FrFunction
-    val options = mutableListOf<FrOption>()
+    var function: FrSlashFunction? = null
+    var textFunction: FrTextFunction? = null
+    val options = mutableListOf<OptionData>()
     val checks = mutableListOf<FrChecks>()
 
     val subcmds = mutableListOf<FrSubcmd>()
@@ -42,17 +44,38 @@ class FrCmd(val name: String, val details: String) {
         return this
     }
 
-    fun addOption(vararg options: FrOption): FrCmd {
+    fun addOptions(vararg options: OptionData): FrCmd {
         this.options.addAll(options)
-        jdaCmdData.addOptions(options.map { it.toJDAOptionData() })
+        jdaCmdData.addOptions(*options)
         return this
     }
 
-    fun setFunction(function: FrFunction): FrCmd {
+    inline fun <reified T> addOption(
+        name: String,
+        details: String,
+        required: Boolean = false,
+        autoComplete: Boolean = false,
+        builder: OptionData.() -> Unit = {}
+    ): FrCmd {
+        val option = FrOption<T>(name, details, required, autoComplete, builder)
+        this.options.add(option)
+        jdaCmdData.addOptions(option)
+        return this
+    }
+
+    fun setFunction(function: FrSlashFunction): FrCmd {
         if (cmdStruct != Cmd)
-            throw IllegalStateException("Subcommandを使用する場合、CommandにFunctionを設定することはできません。")
+            throw IllegalStateException("When use Subcommand, You cannot configure a Function to Command!")
 
         this.function = function
+        return this
+    }
+
+    fun setFunction(function: FrTextFunction): FrCmd {
+        if (cmdStruct != Cmd)
+            throw IllegalStateException("When use Subcommand, You cannot configure a Function to Command!")
+
+        this.textFunction = function
         return this
     }
 
@@ -64,17 +87,30 @@ class FrCmd(val name: String, val details: String) {
     fun build(): FrCmdBuild {
         when (cmdStruct) {
             Cmd -> {
-                routes.add(FrCmdRouteRecord(name, null, null, options, function, checks))
+                routes.add(
+                    FrCmdRouteRecord(
+                        cmdStruct,
+                        FrCmdName(name, *alias),
+                        FrCmdName(null),
+                        FrCmdName(null),
+                        options,
+                        function,
+                        textFunction,
+                        checks
+                    )
+                )
             }
             Cmd_Subcmd -> {
                 for (subcmd in subcmds) {
                     routes.add(
                         FrCmdRouteRecord(
-                            name,
-                            null,
-                            subcmd.name,
+                            cmdStruct,
+                            FrCmdName(name, *alias),
+                            FrCmdName(null),
+                            FrCmdName(subcmd.name, *subcmd.alias),
                             subcmd.options,
                             subcmd.function,
+                            subcmd.textFunction,
                             checks
                         )
                     )
@@ -85,11 +121,13 @@ class FrCmd(val name: String, val details: String) {
                     for (subcmd in subcmdGroup.subcmds) {
                         routes.add(
                             FrCmdRouteRecord(
-                                name,
-                                subcmdGroup.name,
-                                subcmd.name,
+                                cmdStruct,
+                                FrCmdName(name, *alias),
+                                FrCmdName(subcmdGroup.name, *subcmdGroup.alias),
+                                FrCmdName(subcmd.name, *subcmd.alias),
                                 subcmd.options,
                                 subcmd.function,
+                                subcmd.textFunction,
                                 checks
                             )
                         )

@@ -7,19 +7,9 @@ class FrJDAEvent(
     val slash: SlashCommandInteractionEvent?,
     val text: MessageReceivedEvent?
 ) {
-    lateinit var type: Type
-
-    init {
-        if (slash != null && text == null) {
-            type = Type.SLASH
-        } else if (slash == null && text != null) {
-            type = Type.TEXT
-        } else {
-            throw IllegalArgumentException("片方のEventがnullでなければいけません！")
-        }
-    }
-
-    enum class Type {
-        SLASH, TEXT
-    }
+    var type: FrCmdType = if (slash != null && text == null)
+        FrCmdType.SLASH
+    else if (slash == null && text != null)
+        FrCmdType.TEXT
+    else throw IllegalArgumentException("One event must be null!")
 }

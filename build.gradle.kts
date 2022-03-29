@@ -13,9 +13,10 @@ version = when (System.getenv("platform")) {
 
 repositories {
     mavenCentral()
-    maven(url = "https://m2.dv8tion.net/releases")
-    maven(url = "https://oss.sonatype.org/content/groups/public/")
-    maven(url = "https://repo.tomacheese.com")
+    maven("https://m2.dv8tion.net/releases")
+    maven("https://oss.sonatype.org/content/groups/public/")
+    maven("https://repo.tomacheese.com")
+    maven("https://jitpack.io")
     maven {
         url = uri("https://maven.pkg.jetbrains.space/public/p/ktor/eap")
         name = "ktor-eap"
@@ -26,6 +27,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     implementation("net.dv8tion:JDA:5.0.0-alpha.9")
+    implementation("com.github.minndevelopment:jda-ktx:9f01b74")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
     implementation("com.vdurmont:emoji-java:5.1.1")

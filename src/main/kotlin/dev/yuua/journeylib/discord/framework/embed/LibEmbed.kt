@@ -19,19 +19,19 @@ object LibEmbed {
     }
 
     fun failure(): EmbedBuilder {
-        return EmbedBuilder().setColor(LibEmbedColor.failure)
+        return EmbedBuilder().setColor(FrColor.failure)
     }
 
     fun caution(): EmbedBuilder {
-        return EmbedBuilder().setColor(LibEmbedColor.caution)
+        return EmbedBuilder().setColor(FrColor.caution)
     }
 
     fun success(): EmbedBuilder {
-        return EmbedBuilder().setColor(LibEmbedColor.success)
+        return EmbedBuilder().setColor(FrColor.success)
     }
 
     fun normal(): EmbedBuilder {
-        return EmbedBuilder().setColor(LibEmbedColor.normal)
+        return EmbedBuilder().setColor(FrColor.normal)
     }
 
     fun failure(emoji: String, name: String, message: String): EmbedBuilder {

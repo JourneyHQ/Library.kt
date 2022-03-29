@@ -1,9 +1,9 @@
 package dev.yuua.journeylib.discord.framework.command.scope
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecks
 
-data class FrCmdScope (
+data class FrCmdScope(
     val guilds: MutableList<String>,
     val users: MutableList<String>,
-    val rule: (event: SlashCommandInteractionEvent) -> Boolean
+    val checks: FrChecks?
 )
