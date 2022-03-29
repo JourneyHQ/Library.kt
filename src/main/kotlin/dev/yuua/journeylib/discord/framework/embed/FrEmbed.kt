@@ -2,7 +2,7 @@ package dev.yuua.journeylib.discord.framework.embed
 
 import net.dv8tion.jda.api.EmbedBuilder
 
-object LibEmbed {
+object FrEmbed {
     private fun escapeChannelMention(message: String):String {
         return message.let {
             var replaceMessageTemp = it

@@ -1,6 +1,8 @@
 package dev.yuua.journeylib.discord.framework.command.builder.structure
 
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecks
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecksResult
+import dev.yuua.journeylib.discord.framework.command.event.FrCmdEvent
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandGroupData
 
 class FrSubcmdGroup(val name: String, val details: String, vararg val alias: String) {
@@ -17,8 +19,8 @@ class FrSubcmdGroup(val name: String, val details: String, vararg val alias: Str
         return this
     }
 
-    fun addChecks(checks: FrChecks): FrSubcmdGroup {
-        this.checks = checks
+    fun setChecks(checks: (FrCmdEvent) -> FrChecksResult): FrSubcmdGroup {
+        this.checks = FrChecks { checks(it) }
         return this
     }
 }

@@ -1,9 +1,11 @@
 package dev.yuua.journeylib.discord.framework.command.builder.structure
 
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecks
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecksResult
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrSlashFunction
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrTextFunction
 import dev.yuua.journeylib.discord.framework.command.builder.option.FrOption
+import dev.yuua.journeylib.discord.framework.command.event.FrCmdEvent
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData
 
@@ -46,8 +48,8 @@ class FrSubcmd(val name: String, val details: String, vararg val alias: String) 
         return this
     }
 
-    fun addChecks(checks: FrChecks): FrSubcmd {
-        this.checks = checks
+    fun setChecks(checks: (FrCmdEvent) -> FrChecksResult): FrSubcmd {
+        this.checks = FrChecks { checks(it) }
         return this
     }
 }

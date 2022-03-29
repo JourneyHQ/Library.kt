@@ -1,9 +1,11 @@
 package dev.yuua.journeylib.discord.framework.command.builder.structure
 
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecks
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecksResult
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrSlashFunction
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrTextFunction
 import dev.yuua.journeylib.discord.framework.command.builder.option.FrOption
+import dev.yuua.journeylib.discord.framework.command.event.FrCmdEvent
 import dev.yuua.journeylib.discord.framework.command.router.FrCmdRouteRecord
 import dev.yuua.journeylib.discord.framework.command.router.FrCmdTypeEnum.*
 import net.dv8tion.jda.api.interactions.commands.build.Commands
@@ -79,8 +81,8 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
         return this
     }
 
-    fun addChecks(checks: FrChecks): FrCmd {
-        this.checks.add(checks)
+    fun setChecks(checks: (FrCmdEvent) -> FrChecksResult): FrCmd {
+        this.checks.add(FrChecks { checks(it) })
         return this
     }
 
