@@ -5,7 +5,7 @@ import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecksRe
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecksResultType
 
 data class FrCmdScope(
-    val guilds: MutableList<String> = mutableListOf(),
-    val users: MutableList<String> = mutableListOf(),
+    val guilds: List<String> = listOf(),
+    val users: List<String> = listOf(),
     val checks: FrChecks? = FrChecks { FrChecksResult("", FrChecksResultType.PASSED) }
 )

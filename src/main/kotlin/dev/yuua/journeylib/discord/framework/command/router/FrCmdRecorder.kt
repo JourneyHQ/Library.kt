@@ -28,10 +28,9 @@ class FrCmdRecorder(jda: JDA) {
 
             // コマンドを登録するGuild (Scopeが指定されていない場合はEmpty)
             val guilds = mutableListOf<String>()
-            FrCmdScopeDB.record.filter {
-                it.key.containsAll(frCommand.routes)
-            }.values.forEach {
-                guilds.addAll(it.guilds)
+            
+            FrCmdScopeDB.find(frCommand)?.guilds?.forEach {
+                guilds.add(it)
             }
 
             val targetGuilds =

@@ -60,7 +60,8 @@ class FrTextCmdRouter(val jda: JDA) {
 
             val frCmdEvent = it.toFrCmdEvent(options)
 
-            for (frCmdScope in FrCmdScopeDB.find(command)) {
+            val frCmdScope = FrCmdScopeDB.find(command)
+            if (frCmdScope != null) {
                 //制限されていて、リストに含まれていない場合
                 val guilds = frCmdScope.guilds
                 val users = frCmdScope.users

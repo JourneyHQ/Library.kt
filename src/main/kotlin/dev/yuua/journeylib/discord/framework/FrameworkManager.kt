@@ -5,6 +5,7 @@ import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdStru
 import dev.yuua.journeylib.discord.framework.command.router.FrCmdRecorder
 import dev.yuua.journeylib.discord.framework.command.router.FrSlashCmdRouter
 import dev.yuua.journeylib.discord.framework.command.router.FrTextCmdRouter
+import dev.yuua.journeylib.discord.framework.command.scope.FrCmdScopeDB
 import dev.yuua.journeylib.discord.framework.event.FrEventRecorder
 import dev.yuua.journeylib.discord.framework.event.FrEventStruct
 import dev.yuua.journeylib.universal.LibFlow
@@ -121,8 +122,11 @@ object FrameworkManager {
             builder()
         }.awaitReady()
         buildFinished = true
+
+        FrCmdScopeDB.init()
         FrCmdRecorder(jda)
         FrEventRecorder(jda)
+
         FrSlashCmdRouter(jda)
         FrTextCmdRouter(jda)
         return this

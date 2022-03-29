@@ -1,26 +1,53 @@
 package dev.yuua.journeylib.discord.framework.command.scope
 
 import dev.yuua.journeylib.discord.framework.FrameworkManager
+import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmd
 import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdStruct
 import dev.yuua.journeylib.discord.framework.command.router.FrCmdRouteRecord
+import dev.yuua.journeylib.universal.LibFlow
 import org.reflections.Reflections
 
 object FrCmdScopeDB {
-    val record = hashMapOf<MutableList<FrCmdRouteRecord>, FrCmdScope>()
+    private val libFlow: LibFlow = LibFlow(this.javaClass.simpleName)
 
-    fun add(scopedPackage: String, scope: FrCmdScope) {
+    val record = hashMapOf<String, FrCmdScope>()
+
+    fun init() {
+        val scopeClasses = Reflections(FrameworkManager.commandPackage)
+            .getSubTypesOf(FrCmdScopeStruct::class.java)
+
+        for (scopeClass in scopeClasses) {
+            val scopeClassInst = scopeClass.getConstructor().newInstance()
+            scopeClassInst.scope().forEach { (packageString, scope) ->
+                add(packageString, scope)
+                libFlow.success("Successfully applied scope to $packageString")
+            }
+        }
+    }
+
+    private fun add(scopedPackage: String, scope: FrCmdScope): FrCmdScopeDB {
         val classes =
             Reflections("${FrameworkManager.commandPackage}.$scopedPackage")
                 .getSubTypesOf(FrCmdStruct::class.java)
-        val records = mutableListOf<FrCmdRouteRecord>()
-        val cmdSubstrates = classes.map { it.getConstructor().newInstance().cmd().cmd.routes }
 
-        for (cmdSubstrate in cmdSubstrates) records.addAll(cmdSubstrate)
+        val frCmds = classes.map { it.getConstructor().newInstance().cmd().cmd }
 
-        record[records] = scope
+        for (frCmd in frCmds) record[frCmd.name] = scope
+
+        return this
     }
 
-    fun find(routeRecord: FrCmdRouteRecord): MutableList<FrCmdScope> {
-        return record.filter { it.key.contains(routeRecord) }.values.toMutableList()
+    fun find(frCmd: FrCmd): FrCmdScope? {
+        val list = record.filterKeys { it == frCmd.name }.values.toList()
+        return if (list.size == 1)
+            list[0]
+        else null
+    }
+
+    fun find(frCmdRouteRecord: FrCmdRouteRecord): FrCmdScope? {
+        val list = record.filterKeys { frCmdRouteRecord.cmd.allNames().contains(it) }.values.toList()
+        return if (list.size == 1)
+            list[0]
+        else null
     }
 }
