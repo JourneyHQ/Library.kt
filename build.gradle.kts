@@ -39,7 +39,7 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("org.reflections:reflections:0.10.2")
 
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.5")
+    implementation("com.squareup.okhttp3:okhttp:5.0.0-SNAPSHOT")
     implementation("org.jraf:klibnotion:1.11.0")
 
 }
