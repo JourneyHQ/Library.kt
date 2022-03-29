@@ -1,5 +1,5 @@
 package dev.yuua.journeylib.discord.framework.command.builder.structure
 
-interface FrCmdSubstrate {
+interface FrCmdStruct {
     fun cmd(): FrCmdBuild
 }

@@ -36,7 +36,6 @@ dependencies {
     implementation("org.json:json:20211205")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("args4j:args4j:2.33")
-    implementation("net.htmlparser.jericho:jericho-html:3.4")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
     implementation("org.reflections:reflections:0.10.2")
 

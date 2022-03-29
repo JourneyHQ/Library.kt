@@ -3,7 +3,7 @@ package dev.yuua.journeylib.discord.framework.command.router
 import dev.minn.jda.ktx.interactions.updateCommands
 import dev.yuua.journeylib.discord.framework.FrameworkManager
 import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmd
-import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdSubstrate
+import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdStruct
 import dev.yuua.journeylib.discord.framework.command.scope.FrCmdScopeDB
 import dev.yuua.journeylib.universal.LibFlow
 import net.dv8tion.jda.api.JDA
@@ -22,7 +22,7 @@ class FrCmdRecorder(jda: JDA) {
         val allCmdNames = mutableListOf<String?>()
 
         for (commandClass in FrameworkManager.getCommandClasses()) {
-            val commandInstance: FrCmdSubstrate = commandClass.getConstructor().newInstance()
+            val commandInstance: FrCmdStruct = commandClass.getConstructor().newInstance()
             val frCommand = commandInstance.cmd().cmd
             val jdaCommandData: SlashCommandData = commandInstance.cmd().cmd.jdaCmdData
 

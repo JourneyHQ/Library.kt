@@ -1,10 +1,12 @@
 package dev.yuua.journeylib.discord.framework
 
 import dev.minn.jda.ktx.default
-import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdSubstrate
+import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdStruct
 import dev.yuua.journeylib.discord.framework.command.router.FrCmdRecorder
 import dev.yuua.journeylib.discord.framework.command.router.FrSlashCmdRouter
 import dev.yuua.journeylib.discord.framework.command.router.FrTextCmdRouter
+import dev.yuua.journeylib.discord.framework.event.FrEventRecorder
+import dev.yuua.journeylib.discord.framework.event.FrEventStruct
 import dev.yuua.journeylib.universal.LibFlow
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
@@ -29,8 +31,8 @@ object FrameworkManager {
 
     lateinit var commandPackage: String
     lateinit var eventPackage: String
-    val events = mutableListOf<ListenerAdapter>()
-    val commands = mutableListOf<FrCmdSubstrate>()
+    val events = mutableListOf<FrEventStruct>()
+    val commands = mutableListOf<FrCmdStruct>()
 
     fun setJDABuilder(builder: JDABuilder.() -> Unit = {}): FrameworkManager {
         this.builder = { builder() }
@@ -71,17 +73,17 @@ object FrameworkManager {
     }
 
     fun initEventManager(eventPackage: String): FrameworkManager {
-        val eventClasses = Reflections(eventPackage).getSubTypesOf(ListenerAdapter::class.java)
+        val eventClasses = Reflections(eventPackage).getSubTypesOf(FrEventStruct::class.java)
 
         if (eventClasses.isEmpty())
-            throw UnsupportedOperationException("Package:$eventPackage が空か、見つかりませんでした。")
+            throw UnsupportedOperationException("Package:$eventPackage was empty or not found!")
         this.eventPackage = eventPackage
 
         val events = eventClasses.filter {
             it.enclosingClass == null && !it.name.contains("$")
         }.map {
             libFlow.success("Event:${it.simpleName} を登録しました！")
-            (it.getConstructor() as Constructor<*>).newInstance() as ListenerAdapter
+            (it.getConstructor() as Constructor<*>).newInstance() as FrEventStruct
         }
 
         this.events.addAll(events)
@@ -90,17 +92,17 @@ object FrameworkManager {
     }
 
     fun initCmdManager(commandPackage: String): FrameworkManager {
-        val commandClasses = Reflections(commandPackage).getSubTypesOf(FrCmdSubstrate::class.java)
+        val commandClasses = Reflections(commandPackage).getSubTypesOf(FrCmdStruct::class.java)
 
         if (commandClasses.isEmpty())
-            throw UnsupportedOperationException("Package:$commandPackage が空か、見つかりませんでした。")
+            throw UnsupportedOperationException("Package:$commandPackage was empty or not found!")
         this.commandPackage = commandPackage
 
         val commands = commandClasses.filter {
             it.enclosingClass == null && !it.name.contains("$")
         }.map {
-            libFlow.success("Command:${it.simpleName} を登録しました！")
-            (it.getConstructor() as Constructor<*>).newInstance() as FrCmdSubstrate
+            libFlow.success("Command:${it.simpleName} recorded!")
+            (it.getConstructor() as Constructor<*>).newInstance() as FrCmdStruct
         }
 
         this.commands.addAll(commands)
@@ -108,10 +110,10 @@ object FrameworkManager {
         return this
     }
 
-    fun getCommandClasses(): MutableSet<Class<out FrCmdSubstrate>> {
+    fun getCommandClasses(): MutableSet<Class<out FrCmdStruct>> {
         if (!buildFinished)
-            throw IllegalStateException("Buildが完了していないため、Classを取得できませんでした。")
-        return Reflections(commandPackage).getSubTypesOf(FrCmdSubstrate::class.java)
+            throw IllegalStateException("Classes could not be retrieved because build was not completed.")
+        return Reflections(commandPackage).getSubTypesOf(FrCmdStruct::class.java)
     }
 
     fun build(): FrameworkManager {
@@ -120,6 +122,7 @@ object FrameworkManager {
         }.awaitReady()
         buildFinished = true
         FrCmdRecorder(jda)
+        FrEventRecorder(jda)
         FrSlashCmdRouter(jda)
         FrTextCmdRouter(jda)
         return this
