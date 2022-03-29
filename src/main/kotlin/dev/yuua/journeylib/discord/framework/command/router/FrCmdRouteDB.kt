@@ -14,7 +14,7 @@ object FrCmdRouteDB {
         }.first()
     }
 
-    fun findStruct(cmd: String): FrCmdStruct {
+    fun findStruct(cmd: String): FrCmdTypeEnum {
         return record.first { it.cmd.allNames().contains(cmd) }.struct
     }
 }

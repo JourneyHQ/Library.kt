@@ -7,7 +7,7 @@ import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdName
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 data class FrCmdRouteRecord(
-    val struct: FrCmdStruct,
+    val struct: FrCmdTypeEnum,
     val cmd: FrCmdName,
     val subcmdGroup: FrCmdName,
     val subcmd: FrCmdName,

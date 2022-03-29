@@ -1,7 +1,7 @@
 package dev.yuua.journeylib.discord.framework.command.router
 
 import dev.yuua.journeylib.discord.framework.command.builder.option.FrOptionLib
-import dev.yuua.journeylib.discord.framework.command.router.FrCmdStruct.*
+import dev.yuua.journeylib.discord.framework.command.router.FrCmdTypeEnum.*
 
 object FrTextAnalyzer {
     fun analyze(prefix: String, text: String): Pair<FrCmdRouteRecord, FrOptionLib.OptionAnalysisResult?> {

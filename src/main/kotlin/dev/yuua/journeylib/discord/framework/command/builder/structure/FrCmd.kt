@@ -5,7 +5,7 @@ import dev.yuua.journeylib.discord.framework.command.builder.function.FrSlashFun
 import dev.yuua.journeylib.discord.framework.command.builder.function.FrTextFunction
 import dev.yuua.journeylib.discord.framework.command.builder.option.FrOption
 import dev.yuua.journeylib.discord.framework.command.router.FrCmdRouteRecord
-import dev.yuua.journeylib.discord.framework.command.router.FrCmdStruct.*
+import dev.yuua.journeylib.discord.framework.command.router.FrCmdTypeEnum.*
 import net.dv8tion.jda.api.interactions.commands.build.Commands
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
