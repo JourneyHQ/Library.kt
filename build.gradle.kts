@@ -29,7 +29,7 @@ dependencies {
     implementation("net.dv8tion:JDA:5.0.0-alpha.9")
     implementation("com.github.minndevelopment:jda-ktx:9f01b74")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
-    implementation("com.sedmelluq:lavaplayer:1.3.77")
+    implementation("com.sedmelluq:lavaplayer:1.3.78")
     implementation("com.vdurmont:emoji-java:5.1.1")
 
     implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
