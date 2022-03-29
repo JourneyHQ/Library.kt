@@ -3,9 +3,9 @@ package dev.yuua.journeylib.config
 import dev.yuua.journeylib.universal.LibFlow
 import org.json.JSONObject
 
-object ConfigPrototype {
+object ConfigStruct {
     private val libFlow: LibFlow = LibFlow(this.javaClass.simpleName)
-    lateinit var prototype: JSONObject
+    lateinit var struct: JSONObject
     lateinit var path: String
 
     val routes = HashMap<String, ConfigOption>()
@@ -17,7 +17,7 @@ object ConfigPrototype {
     )
 
     fun init() {
-        for ((route, data) in ConfigAnalysis().analyze(prototype, null)
+        for ((route, data) in ConfigAnalysis().analyze(struct, null)
             .routes.filter { (_, data) -> data.type == Config.OptionType.String })
             routes[route] = analyzeSyntax(data.value as String)
     }

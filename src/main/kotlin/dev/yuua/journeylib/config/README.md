@@ -17,7 +17,7 @@
     }
     ```
 
-2. そして、設定の設計ファイルを用意します。 `デフォルト: ./config.prototype.json`
+2. そして、設定の設計ファイルを用意します。 `デフォルト: ./config.struct.json`
 
     ```json
     {
@@ -36,7 +36,7 @@
 
     ```kotlin
     fun main() {
-    	Config.from("./config.json","./config.prototype.json")
+    	Config.from("./config.json","./config.struct.json")
     	//とか書いてありますが、デフォルト値の場合はConfig.from()で大丈夫です。
     
     	println(Config.boolean("doPowa")) //-> true

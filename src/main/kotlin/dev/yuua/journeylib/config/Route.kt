@@ -13,7 +13,7 @@ object Route {
         val objects = elements.dropLast(1)
         val last = elements.last()
         var current = json
-        val default = ConfigPrototype.routes[route]?.defaultValue
+        val default = ConfigStruct.routes[route]?.defaultValue
 
         for (element in objects) {
             if (!current.has(element))

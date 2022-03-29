@@ -3,5 +3,5 @@ build
 artifacts
 IntelliJTask/Publish.run.xml
 src/main/kotlin/dev/yuua/journeylib/main.kt
-config.prototype.json
+config.struct.json
 config.json
