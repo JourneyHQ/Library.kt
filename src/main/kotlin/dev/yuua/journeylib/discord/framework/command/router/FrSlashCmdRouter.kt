@@ -4,7 +4,7 @@ import dev.minn.jda.ktx.Embed
 import dev.minn.jda.ktx.listener
 import dev.minn.jda.ktx.messages.reply_
 import dev.yuua.journeylib.discord.framework.FrExtention.Message.codeBlock
-import dev.yuua.journeylib.discord.framework.command.builder.function.CheckResultType
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecksResultType
 import dev.yuua.journeylib.discord.framework.command.event.FrEventLib.toFrCmdEvent
 import dev.yuua.journeylib.discord.framework.command.scope.FrCmdScopeDB
 import dev.yuua.journeylib.discord.framework.embed.FrColor
@@ -41,7 +41,7 @@ class FrSlashCmdRouter(val jda: JDA) {
                 val userRestricted = users.isNotEmpty() && !users.contains(it.user.id)
                 val ruleRestricted =
                     if (checkResult != null)
-                        checkResult.type != CheckResultType.PASSED
+                        checkResult.type != FrChecksResultType.PASSED
                     else false
 
                 if (guildRestricted || userRestricted || ruleRestricted) {
@@ -59,7 +59,7 @@ class FrSlashCmdRouter(val jda: JDA) {
 
             for (frChecks in command.checks) {
                 val checkResult = frChecks.check(frCmdEvent)
-                if (checkResult.type != CheckResultType.PASSED) {
+                if (checkResult.type != FrChecksResultType.PASSED) {
                     it.reply_(
                         embed = Embed {
                             title = ":interrobang: ${checkResult.type.code}"

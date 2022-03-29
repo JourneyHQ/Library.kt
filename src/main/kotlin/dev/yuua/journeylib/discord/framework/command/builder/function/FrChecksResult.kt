@@ -1,6 +1,6 @@
 package dev.yuua.journeylib.discord.framework.command.builder.function
 
-data class CheckResult(
+data class FrChecksResult(
     val message: String,
-    val type: CheckResultType
+    val type: FrChecksResultType
 )

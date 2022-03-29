@@ -4,7 +4,7 @@ import dev.minn.jda.ktx.Embed
 import dev.minn.jda.ktx.listener
 import dev.minn.jda.ktx.messages.reply_
 import dev.yuua.journeylib.discord.framework.FrExtention.Message.codeBlock
-import dev.yuua.journeylib.discord.framework.command.builder.function.CheckResultType
+import dev.yuua.journeylib.discord.framework.command.builder.function.FrChecksResultType
 import dev.yuua.journeylib.discord.framework.command.builder.option.FrOptionLib.OptionAnalysisResultType.*
 import dev.yuua.journeylib.discord.framework.command.event.FrCmdEvent
 import dev.yuua.journeylib.discord.framework.command.event.FrEventLib.toFrCmdEvent
@@ -70,7 +70,7 @@ class FrTextCmdRouter(val jda: JDA) {
                 val userRestricted = users.isNotEmpty() && !users.contains(it.author.id)
                 val ruleRestricted =
                     if (checkResult != null)
-                        checkResult.type != CheckResultType.PASSED
+                        checkResult.type != FrChecksResultType.PASSED
                     else false
 
                 if (guildRestricted || userRestricted || ruleRestricted) {
@@ -87,7 +87,7 @@ class FrTextCmdRouter(val jda: JDA) {
 
             for (frChecks in command.checks) {
                 val checkResult = frChecks.check(frCmdEvent)
-                if (checkResult.type != CheckResultType.PASSED) {
+                if (checkResult.type != FrChecksResultType.PASSED) {
                     message.reply_(
                         embed = Embed {
                             title = ":interrobang: ${checkResult.type.code}"
