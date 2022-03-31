@@ -84,7 +84,7 @@ jobs:
           git add *
           git commit -m "add: ${{ env.name }} v${{ env.project_version }} ${{ env.emoji }}"
           git push
-      - name: 🗃️ Publish Release (${{ env.ref_dev }})
+      - name: 🗃️ Publish Release (main)
         env:
           project_version: ${{ steps.version.outputs.new_version }}
         if: github.ref_name == env.ref_main
@@ -92,7 +92,7 @@ jobs:
         with:
           generate_release_notes: true
           tag_name: ${{ env.project_version }}
-      - name: 🗃️ Publish Release (${{ env.ref_dev }})
+      - name: 🗃️ Publish Release (dev)
         env:
           project_version: ${{ steps.version.outputs.new_version }}
         if: github.ref_name == env.ref_dev
