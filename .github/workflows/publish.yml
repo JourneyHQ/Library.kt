@@ -91,7 +91,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           generate_release_notes: true
-          tag_name: ${{ env.project_version }}
+          tag_name: "v${{ env.project_version }}"
       - name: 🗃️ Publish Release (dev)
         env:
           project_version: ${{ steps.version.outputs.new_version }}
@@ -100,7 +100,7 @@ jobs:
         with:
           prerelease: true
           generate_release_notes: true
-          tag_name: ${{ env.project_version }}
+          tag_name: "v${{ env.project_version }}"
       - name: 🛰️ End Notification
         uses: sarisia/actions-status-discord@v1
         env:
