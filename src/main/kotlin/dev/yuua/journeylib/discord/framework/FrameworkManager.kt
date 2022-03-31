@@ -83,7 +83,7 @@ object FrameworkManager {
         val events = eventClasses.filter {
             it.enclosingClass == null && !it.name.contains("$")
         }.map {
-            libFlow.success("Event:${it.simpleName} を登録しました！")
+            libFlow.success("Event:${it.simpleName} recorded")
             (it.getConstructor() as Constructor<*>).newInstance() as FrEventStruct
         }
 

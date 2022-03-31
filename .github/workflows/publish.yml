@@ -1,4 +1,4 @@
-name: 🗃️ Deploy
+name: 🗃️ Publish
 
 on:
   push:
@@ -7,11 +7,16 @@ on:
       - dev
 
 jobs:
-  Transmit:
+  Publish:
     env:
+      emoji: ☕
       rdns: dev.yuua
       name: JourneyLib
       platform: actions
+      jdk: 16
+      gradle_cmd: build
+      ref_main: "main"
+      ref_dev: "dev"
     runs-on: ubuntu-latest
     steps:
       - name: ⌨️ Project Name
@@ -31,14 +36,14 @@ jobs:
         with:
           nodetail: true
           webhook: ${{ secrets.DISCORD_NOTIFY }}
-          title: "Started: ☕ ${{ env.name }} v${{ steps.version.outputs.new_version }}"
+          title: "Started: ${{ env.emoji }} ${{ env.name }} v${{ steps.version.outputs.new_version }}"
           description: "[${{ github.workflow }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           color: 0xeaa6e9
       - name: 📻 Setup JDK16
         uses: actions/setup-java@v3.0.0
         with:
           distribution: "zulu"
-          java-version: "16"
+          java-version: ${{ env.jdk }}
       - name: 🐘 Setup Gradle
         uses: gradle/gradle-build-action@v2
         with:
@@ -75,14 +80,31 @@ jobs:
           git config --global user.name "AutoBuilder"
           git config --global user.email yuuahp@icloud.com
           git add *
-          git commit -m "add: ${{ env.name }} v${{ env.project_version }} ☕"
+          git commit -m "add: ${{ env.name }} v${{ env.project_version }} ${{ env.emoji }}"
           git push
+      - name: 🗃️ Publish Release (${{ env.ref_dev }})
+        env:
+          project_version: ${{ steps.version.outputs.new_version }}
+        if: github.ref_name == env.ref_main
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          tag_name: ${{ env.project_version }}
+      - name: 🗃️ Publish Release (${{ env.ref_dev }})
+        env:
+          project_version: ${{ steps.version.outputs.new_version }}
+        if: github.ref_name == env.ref_dev
+        uses: softprops/action-gh-release@v1
+        with:
+          prerelease: true
+          generate_release_notes: true
+          tag_name: ${{ env.project_version }}
       - name: 🛰️ End Notification
         uses: sarisia/actions-status-discord@v1
         env:
           project_version: ${{ steps.version.outputs.new_version }}
         with:
           webhook: ${{ secrets.DISCORD_NOTIFY }}
-          title: "☕ ${{ env.name }} v${{ env.project_version }}"
+          title: "${{ env.emoji }} ${{ env.name }} v${{ env.project_version }}"
           description: "`implementation(\"${{ env.rdns }}:${{ steps.name.outputs.lowercase }}:${{ env.project_version }}\")`"
           color: 0xeaa6e9
