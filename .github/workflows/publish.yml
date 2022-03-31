@@ -70,6 +70,8 @@ jobs:
       - name: 🗃️ Deploy
         env:
           project_version: ${{ steps.version.outputs.new_version }}
+          project_user: ${{ secrets.user }}
+          project_token: ${{ secrets.token }}
         run: |
           echo $project_version
           mv ./repository/docs/ ./project/artifacts/

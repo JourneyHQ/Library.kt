@@ -58,6 +58,20 @@ publishing {
             name = "JourneyLib"
             url = uri("file:/${project.projectDir}/artifacts")
         }
+        maven {
+            name = "JourneyLib"
+            url = uri("https://maven.pkg.github.com/yuuahp/JourneyLib")
+            credentials {
+                username = when (System.getenv("platform")) {
+                    "actions" -> System.getenv("project_user")
+                    else -> project.findProperty("user") as String
+                }
+                password = when (System.getenv("platform")) {
+                    "actions" -> System.getenv("project_token")
+                    else -> project.findProperty("token") as String
+                }
+            }
+        }
     }
     publications {
         register<MavenPublication>("gpr") {
