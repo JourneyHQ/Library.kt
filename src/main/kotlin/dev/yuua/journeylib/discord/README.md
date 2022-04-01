@@ -27,7 +27,7 @@
 
 ```kotlin 
 class Ping : FrCmdStruct {
-    override fun cmd() = FrCmd("ping")
+    override fun cmd() = FrCmd("ping", "ping pong")
         .addOptions(FrOption<String>("name", "your name.", true))
         .setFunction(ping)
         .build()
@@ -43,13 +43,13 @@ class Ping : FrCmdStruct {
 
 ```kotlin 
 class Ping : FrCmdStruct {
-    override fun cmd() = FrCmd("ping", "ping pong", "pong", "p")
-        .addOptions(FrOption<String>("text", "text!", true))
+    override fun cmd() = FrCmd("ping", "ping pong", /* aliases -> */ "pong", "p") 
+        .addOptions(FrOption<String>("name", "your name.", true))
         .setFunction(ping)
         .build()
 
     private val ping = FrTextFunction { jda, guild, isFromGuild, isFromThread, channel, channelType, member, user, event ->
-        event.reply("${event.option<String>("text")} Pong!").queue()
+        event.reply("${event.option<String>("name")} Pong!").queue()
     }
 }
 ``` 
