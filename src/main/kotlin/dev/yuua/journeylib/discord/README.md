@@ -63,3 +63,13 @@ class Message : FrEventStruct {
     }
 }
 ``` 
+
+# Todo
+- [ ] Java language support
+- [ ] Framework multiple instance support
+- [ ] Guild-only command (Nonnull Guild & Member)
+- [ ] English & Japanese support
+- [ ] Javadoc (<- Important)
+- [ ] Inline Autocomplete Function
+- [ ] No timeout button / selectmenu support (Class)
+- [ ] ContextMenu Support (Class)
