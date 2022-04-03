@@ -29,7 +29,7 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
 
     fun addSubcmd(vararg subcmds: FrSubcmd): FrCmd {
         this.subcmds.addAll(subcmds)
-        checks.addAll(subcmds.map { it.checks })
+        checks.addAll(subcmds.mapNotNull { it.checks })
         jdaCmdData.addSubcommands(subcmds.map { it.jdaSubcmdData })
         cmdStruct = Cmd_Subcmd
         return this
@@ -38,8 +38,9 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
     fun addSubcmdGroup(vararg subcmdGroups: FrSubcmdGroup): FrCmd {
         this.subcmdGroups.addAll(subcmdGroups)
         for (subcmdGroup in subcmdGroups) {
-            checks.add(subcmdGroup.checks)
-            checks.addAll(subcmdGroup.subcmds.map { it.checks })
+            val subcmdGroupChecks = subcmdGroup.checks
+            if (subcmdGroupChecks != null) checks.add(subcmdGroupChecks)
+            checks.addAll(subcmdGroup.subcmds.mapNotNull { it.checks })
         }
         jdaCmdData.addSubcommandGroups(subcmdGroups.map { it.jdaSubcmdGroupData })
         cmdStruct = Cmd_SubcmdGroup

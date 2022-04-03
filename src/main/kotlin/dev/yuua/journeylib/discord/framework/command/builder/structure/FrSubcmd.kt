@@ -16,7 +16,7 @@ class FrSubcmd(val name: String, val details: String, vararg val alias: String) 
     var function: FrSlashFunction? = null
     var textFunction: FrTextFunction? = null
     val options = mutableListOf<OptionData>()
-    lateinit var checks: FrChecks
+    var checks: FrChecks? = null
 
     fun addOptions(vararg options: OptionData): FrSubcmd {
         this.options.addAll(options)

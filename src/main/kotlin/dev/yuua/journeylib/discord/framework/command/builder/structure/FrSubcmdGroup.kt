@@ -9,7 +9,7 @@ class FrSubcmdGroup(val name: String, val details: String, vararg val alias: Str
 
     val jdaSubcmdGroupData = SubcommandGroupData(name, details)
 
-    lateinit var checks: FrChecks
+    var checks: FrChecks? = null
 
     val subcmds = mutableListOf<FrSubcmd>()
 
