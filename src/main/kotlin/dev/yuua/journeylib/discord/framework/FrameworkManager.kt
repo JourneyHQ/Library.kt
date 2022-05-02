@@ -1,23 +1,28 @@
 package dev.yuua.journeylib.discord.framework
 
 import dev.minn.jda.ktx.default
-import dev.yuua.journeylib.discord.framework.command.builder.structure.FrCmdStruct
-import dev.yuua.journeylib.discord.framework.command.router.FrCmdRecorder
-import dev.yuua.journeylib.discord.framework.command.router.FrSlashCmdRouter
-import dev.yuua.journeylib.discord.framework.command.router.FrTextCmdRouter
-import dev.yuua.journeylib.discord.framework.command.scope.FrCmdScopeDB
-import dev.yuua.journeylib.discord.framework.event.FrEventRecorder
-import dev.yuua.journeylib.discord.framework.event.FrEventStruct
+import dev.yuua.journeylib.discord.framework.FrameworkManager.ManagerType.*
+import dev.yuua.journeylib.discord.framework.function.button.FrButtonStruct
+import dev.yuua.journeylib.discord.framework.function.command.builder.structure.FrCommandStruct
+import dev.yuua.journeylib.discord.framework.function.command.router.FrCommandRecorder
+import dev.yuua.journeylib.discord.framework.function.command.router.FrSlashCmdRouter
+import dev.yuua.journeylib.discord.framework.function.command.router.FrTextCmdRouter
+import dev.yuua.journeylib.discord.framework.function.scope.FrCmdScopeDB
+import dev.yuua.journeylib.discord.framework.function.contextmenu.FrContextMenuStruct
+import dev.yuua.journeylib.discord.framework.function.event.FrEventRecorder
+import dev.yuua.journeylib.discord.framework.function.event.FrEventStruct
+import dev.yuua.journeylib.discord.framework.function.modal.FrModalStruct
+import dev.yuua.journeylib.discord.framework.function.scope.FrScopeStruct
+import dev.yuua.journeylib.discord.framework.function.selectmenu.FrSelectMenuStruct
 import dev.yuua.journeylib.universal.LibFlow
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
-import net.dv8tion.jda.api.hooks.ListenerAdapter
 import net.dv8tion.jda.api.requests.GatewayIntent
 import org.reflections.Reflections
 import java.lang.reflect.Constructor
 import kotlin.time.Duration
 
-object FrameworkManager {
+class FrameworkManager {
     private val libFlow: LibFlow = LibFlow(this.javaClass.simpleName)
 
     lateinit var jda: JDA
@@ -29,11 +34,6 @@ object FrameworkManager {
     private lateinit var intent: GatewayIntent
     private lateinit var intents: Array<out GatewayIntent>
     private lateinit var builder: JDABuilder.() -> Unit
-
-    lateinit var commandPackage: String
-    lateinit var eventPackage: String
-    val events = mutableListOf<FrEventStruct>()
-    val commands = mutableListOf<FrCmdStruct>()
 
     fun setJDABuilder(builder: JDABuilder.() -> Unit = {}): FrameworkManager {
         this.builder = { builder() }
@@ -73,48 +73,59 @@ object FrameworkManager {
         return this
     }
 
-    fun initEventManager(eventPackage: String): FrameworkManager {
-        val eventClasses = Reflections(eventPackage).getSubTypesOf(FrEventStruct::class.java)
+    var commandInstances = mutableListOf<FrCommandStruct>()
+    var eventInstances = mutableListOf<FrEventStruct>()
+    var buttonInstances = mutableListOf<FrButtonStruct>()
+    var selectMenuInstances = mutableListOf<FrSelectMenuStruct>()
+    var contextMenuInstances = mutableListOf<FrContextMenuStruct>()
+    var modalInstances = mutableListOf<FrModalStruct>()
+    var scopeInstances = mutableListOf<FrScopeStruct>()
 
-        if (eventClasses.isEmpty())
-            throw UnsupportedOperationException("Package:$eventPackage was empty or not found!")
-        this.eventPackage = eventPackage
-
-        val events = eventClasses.filter {
-            it.enclosingClass == null && !it.name.contains("$")
-        }.map {
-            libFlow.success("Event:${it.simpleName} recorded")
-            (it.getConstructor() as Constructor<*>).newInstance() as FrEventStruct
+    private fun ManagerType.addInstance(function: Class<*>) {
+        when (this) {
+            Command -> commandInstances.add(function.newInstanceAs())
+            Event -> eventInstances.add(function.newInstanceAs())
+            Button -> buttonInstances.add(function.newInstanceAs())
+            SelectMenu -> selectMenuInstances.add(function.newInstanceAs())
+            ContextMenu -> contextMenuInstances.add(function.newInstanceAs())
+            Modal -> modalInstances.add(function.newInstanceAs())
+            Scope -> scopeInstances.add(function.newInstanceAs())
         }
-
-        this.events.addAll(events)
-
-        return this
     }
 
-    fun initCmdManager(commandPackage: String): FrameworkManager {
-        val commandClasses = Reflections(commandPackage).getSubTypesOf(FrCmdStruct::class.java)
-
-        if (commandClasses.isEmpty())
-            throw UnsupportedOperationException("Package:$commandPackage was empty or not found!")
-        this.commandPackage = commandPackage
-
-        val commands = commandClasses.filter {
-            it.enclosingClass == null && !it.name.contains("$")
-        }.map {
-            libFlow.success("Command:${it.simpleName} recorded!")
-            (it.getConstructor() as Constructor<*>).newInstance() as FrCmdStruct
-        }
-
-        this.commands.addAll(commands)
-
-        return this
+    enum class ManagerType(val struct: Class<*>) {
+        Command(FrCommandStruct::class.java),
+        Event(FrEventStruct::class.java),
+        Button(FrButtonStruct::class.java),
+        SelectMenu(FrSelectMenuStruct::class.java),
+        ContextMenu(FrContextMenuStruct::class.java),
+        Modal(FrModalStruct::class.java),
+        Scope(FrScopeStruct::class.java)
     }
 
-    fun getCommandClasses(): MutableSet<Class<out FrCmdStruct>> {
-        if (!buildFinished)
-            throw IllegalStateException("Classes could not be retrieved because build was not completed.")
-        return Reflections(commandPackage).getSubTypesOf(FrCmdStruct::class.java)
+    private inline fun <reified T> Class<*>.newInstanceAs(): T {
+        return (this.getConstructor() as Constructor<*>).newInstance() as T
+    }
+
+    /**
+     * Initialize specific function manager.
+     * @param manager [ManagerType] such as [ManagerType.Command], [ManagerType.Button]
+     * @param targetPackage Path to package that function classes are located.
+     */
+    fun initManager(manager: ManagerType, targetPackage: String): FrameworkManager {
+        val classes = Reflections(targetPackage).getSubTypesOf(manager.struct)
+
+        if (classes.isEmpty())
+            throw UnsupportedOperationException("Package:$targetPackage was empty or not found!")
+
+        val functionClasses = classes.filter {
+            it.enclosingClass == null && !it.name.contains("$")
+        }.onEach {
+            libFlow.success("${manager.name}:${it.simpleName} queued!")
+        }
+
+        functionClasses.forEach { manager.addInstance(it) }
+        return this
     }
 
     fun build(): FrameworkManager {
@@ -123,12 +134,17 @@ object FrameworkManager {
         }.awaitReady()
         buildFinished = true
 
-        FrCmdScopeDB.init()
-        FrCmdRecorder(jda)
-        FrEventRecorder(jda)
+        if (commandInstances.isNotEmpty()) {
+            FrCmdScopeDB(this)
+            FrCommandRecorder(this)
+            FrSlashCmdRouter(this)
+            FrTextCmdRouter(this)
+        }
 
-        FrSlashCmdRouter(jda)
-        FrTextCmdRouter(jda)
+        if (eventInstances.isNotEmpty())
+            FrEventRecorder(this, eventInstances)
+
+        libFlow.success("Successfully logged in as ${jda.selfUser.asTag}!")
         return this
     }
 }
