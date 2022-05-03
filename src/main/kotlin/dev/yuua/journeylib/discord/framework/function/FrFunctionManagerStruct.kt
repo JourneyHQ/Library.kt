@@ -1,10 +1,12 @@
 package dev.yuua.journeylib.discord.framework.function
 
+import dev.yuua.journeylib.discord.framework.Framework
 import dev.yuua.journeylib.universal.LibFlow
 import org.reflections.Reflections
 
 interface FrFunctionManagerStruct<T : FrFunctionStruct> {
     val instances get() = mutableListOf<T>()
+    val framework:Framework
 
     fun record(script: FrFunctionManagerStruct<T>.() -> Unit) {
         script(this)

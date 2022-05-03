@@ -1,21 +1,20 @@
 package dev.yuua.journeylib.discord.framework.function.command.router
 
 import dev.minn.jda.ktx.interactions.updateCommands
-import dev.yuua.journeylib.discord.framework.FrameworkManager
-import dev.yuua.journeylib.discord.framework.function.command.builder.structure.FrCmd
-import dev.yuua.journeylib.discord.framework.function.command.builder.structure.FrCommandStruct
+import dev.yuua.journeylib.discord.framework.Framework
+import dev.yuua.journeylib.discord.framework.function.command.builder.structure.FrCommand
 import dev.yuua.journeylib.discord.framework.function.scope.FrCmdScopeDB
 import dev.yuua.journeylib.universal.LibFlow
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
 
-class FrCommandRecorder(frameworkManager: FrameworkManager) {
+class FrCommandRecorder(framework: Framework) {
     private val libFlow: LibFlow = LibFlow(this.javaClass.simpleName)
 
     init {
-        val jda = frameworkManager.jda
-        val commandList = hashMapOf<Guild, MutableList<FrCmd>>()
-        val commandInstances = frameworkManager.commandInstances
+        val jda = framework.jda
+        val commandList = hashMapOf<Guild, MutableList<FrCommand>>()
+        val commandInstances = framework.commandInstances
         for (guild in jda.guilds) commandList[guild] = ArrayList()
 
         libFlow.task("Recording commands...")
@@ -29,7 +28,7 @@ class FrCommandRecorder(frameworkManager: FrameworkManager) {
             // コマンドを登録するGuild (Scopeが指定されていない場合はEmpty)
             val guilds = mutableListOf<String>()
 
-            FrCmdScopeDB(frameworkManager)
+            FrCmdScopeDB(framework)
                 .find(frCommand)?.guilds?.forEach {
                     guilds.add(it)
                 }

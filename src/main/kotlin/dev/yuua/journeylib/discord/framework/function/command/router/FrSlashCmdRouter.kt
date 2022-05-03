@@ -4,7 +4,7 @@ import dev.minn.jda.ktx.Embed
 import dev.minn.jda.ktx.listener
 import dev.minn.jda.ktx.messages.reply_
 import dev.yuua.journeylib.discord.framework.FrExtention.Message.codeBlock
-import dev.yuua.journeylib.discord.framework.FrameworkManager
+import dev.yuua.journeylib.discord.framework.Framework
 import dev.yuua.journeylib.discord.framework.function.command.builder.function.FrChecksResultType
 import dev.yuua.journeylib.discord.framework.function.command.event.FrEventLib.toFrCmdEvent
 import dev.yuua.journeylib.discord.framework.function.scope.FrCmdScopeDB
@@ -12,9 +12,9 @@ import dev.yuua.journeylib.discord.framework.embed.FrColor
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class FrSlashCmdRouter(private val frameworkManager: FrameworkManager) {
+class FrSlashCmdRouter(private val framework: Framework) {
     init {
-        val jda = frameworkManager.jda
+        val jda = framework.jda
         jda.listener<SlashCommandInteractionEvent> {
             val command = try {
                 FrCmdRouteDB.find(it.name, it.subcommandGroup, it.subcommandName)
@@ -32,7 +32,7 @@ class FrSlashCmdRouter(private val frameworkManager: FrameworkManager) {
 
             val frCmdEvent = it.toFrCmdEvent()
 
-            val frCmdScope = FrCmdScopeDB(frameworkManager).find(command)
+            val frCmdScope = FrCmdScopeDB(framework).find(command)
             if (frCmdScope != null) {
                 //制限されていて、リストに含まれていない場合
                 val guilds = frCmdScope.guilds

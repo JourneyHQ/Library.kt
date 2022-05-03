@@ -1,7 +1,7 @@
 package dev.yuua.journeylib.discord.framework
 
 import dev.minn.jda.ktx.default
-import dev.yuua.journeylib.discord.framework.FrameworkManager.ManagerType.*
+import dev.yuua.journeylib.discord.framework.Framework.ManagerType.*
 import dev.yuua.journeylib.discord.framework.function.button.FrButtonStruct
 import dev.yuua.journeylib.discord.framework.function.command.builder.structure.FrCommandStruct
 import dev.yuua.journeylib.discord.framework.function.command.router.FrCommandRecorder
@@ -22,7 +22,7 @@ import org.reflections.Reflections
 import java.lang.reflect.Constructor
 import kotlin.time.Duration
 
-class FrameworkManager {
+class Framework {
     private val libFlow: LibFlow = LibFlow(this.javaClass.simpleName)
 
     lateinit var jda: JDA
@@ -35,7 +35,7 @@ class FrameworkManager {
     private lateinit var intents: Array<out GatewayIntent>
     private lateinit var builder: JDABuilder.() -> Unit
 
-    fun setJDABuilder(builder: JDABuilder.() -> Unit = {}): FrameworkManager {
+    fun setJDABuilder(builder: JDABuilder.() -> Unit = {}): Framework {
         this.builder = { builder() }
         return this
     }
@@ -47,7 +47,7 @@ class FrameworkManager {
         intent: GatewayIntent,
         vararg intents: GatewayIntent,
         builder: JDABuilder.() -> Unit = {}
-    ): FrameworkManager {
+    ): Framework {
         this.token = token
         this.enableCoroutines = enableCoroutines
         this.timeout = timeout
@@ -63,7 +63,7 @@ class FrameworkManager {
         enableCoroutines: Boolean = true,
         intent: GatewayIntent,
         vararg intents: GatewayIntent
-    ): FrameworkManager {
+    ): Framework {
         this.token = token
         this.enableCoroutines = enableCoroutines
         this.timeout = Duration.INFINITE
@@ -112,7 +112,7 @@ class FrameworkManager {
      * @param manager [ManagerType] such as [ManagerType.Command], [ManagerType.Button]
      * @param targetPackage Path to package that function classes are located.
      */
-    fun initManager(manager: ManagerType, targetPackage: String): FrameworkManager {
+    fun initManager(manager: ManagerType, targetPackage: String): Framework {
         val classes = Reflections(targetPackage).getSubTypesOf(manager.struct)
 
         if (classes.isEmpty())
@@ -128,7 +128,7 @@ class FrameworkManager {
         return this
     }
 
-    fun build(): FrameworkManager {
+    fun build(): Framework {
         jda = default(token, enableCoroutines, timeout, intent, *intents) {
             builder()
         }.awaitReady()

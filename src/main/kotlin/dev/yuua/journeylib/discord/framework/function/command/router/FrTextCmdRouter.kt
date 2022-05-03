@@ -4,7 +4,7 @@ import dev.minn.jda.ktx.Embed
 import dev.minn.jda.ktx.listener
 import dev.minn.jda.ktx.messages.reply_
 import dev.yuua.journeylib.discord.framework.FrExtention.Message.codeBlock
-import dev.yuua.journeylib.discord.framework.FrameworkManager
+import dev.yuua.journeylib.discord.framework.Framework
 import dev.yuua.journeylib.discord.framework.function.command.builder.function.FrChecksResultType
 import dev.yuua.journeylib.discord.framework.function.command.builder.option.FrOptionLib.OptionAnalysisResultType.*
 import dev.yuua.journeylib.discord.framework.function.command.event.FrCmdEvent
@@ -14,9 +14,9 @@ import dev.yuua.journeylib.discord.framework.function.scope.FrCmdScopeDB
 import dev.yuua.journeylib.discord.framework.embed.FrColor
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
-class FrTextCmdRouter(private val frameworkManager: FrameworkManager) {
+class FrTextCmdRouter(private val framework: Framework) {
     init {
-        val jda = frameworkManager.jda
+        val jda = framework.jda
         jda.listener<MessageReceivedEvent> {
             val message = it.message
 
@@ -61,7 +61,7 @@ class FrTextCmdRouter(private val frameworkManager: FrameworkManager) {
 
             val frCmdEvent = it.toFrCmdEvent(options)
 
-            val frCmdScope = FrCmdScopeDB(frameworkManager).find(command)
+            val frCmdScope = FrCmdScopeDB(framework).find(command)
             if (frCmdScope != null) {
                 //制限されていて、リストに含まれていない場合
                 val guilds = frCmdScope.guilds

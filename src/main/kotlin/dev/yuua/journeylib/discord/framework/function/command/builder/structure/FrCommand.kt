@@ -17,7 +17,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData
  * @param details Details of command.
  * @param alias Aliases of command.
  */
-class FrCmd(val name: String, val details: String, vararg val alias: String) {
+class FrCommand(val name: String, val details: String, vararg val alias: String) {
     var build = false
     var cmdStruct = Cmd
 
@@ -34,10 +34,10 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
     val subcmdGroups = mutableListOf<FrSubcmdGroup>()
 
     /**
-     * Add subcommands to [FrCmd].
+     * Add subcommands to [FrCommand].
      * @param subcmds [FrSubcmd]s to add.
      */
-    fun addSubcmd(vararg subcmds: FrSubcmd): FrCmd {
+    fun addSubcmd(vararg subcmds: FrSubcmd): FrCommand {
         this.subcmds.addAll(subcmds)
         checks.addAll(subcmds.mapNotNull { it.checks })
         jdaCmdData.addSubcommands(subcmds.map { it.jdaSubcmdData })
@@ -46,10 +46,10 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
     }
 
     /**
-     * Add [subcmdGroups] to [FrCmd].
+     * Add [subcmdGroups] to [FrCommand].
      * @param subcmdGroups [FrSubcmdGroup]s to add.
      */
-    fun addSubcmdGroup(vararg subcmdGroups: FrSubcmdGroup): FrCmd {
+    fun addSubcmdGroup(vararg subcmdGroups: FrSubcmdGroup): FrCommand {
         this.subcmdGroups.addAll(subcmdGroups)
         for (subcmdGroup in subcmdGroups) {
             val subcmdGroupChecks = subcmdGroup.checks
@@ -62,17 +62,17 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
     }
 
     /**
-     * Add [options] to [FrCmd].
+     * Add [options] to [FrCommand].
      * @param options [OptionData]s to add.
      */
-    fun addOptions(vararg options: OptionData): FrCmd {
+    fun addOptions(vararg options: OptionData): FrCommand {
         this.options.addAll(options)
         jdaCmdData.addOptions(*options)
         return this
     }
 
     /**
-     * Add option to [FrCmd].
+     * Add option to [FrCommand].
      * @param name Name of [OptionData].
      * @param details Description of [OptionData].
      * @param required Whether the option is required or not.
@@ -85,14 +85,14 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
         required: Boolean = false,
         autocomplete: Boolean = false,
         builder: OptionData.() -> Unit = {}
-    ): FrCmd {
+    ): FrCommand {
         val option = FrOption<T>(name, details, required, autocomplete, builder)
         this.options.add(option)
         jdaCmdData.addOptions(option)
         return this
     }
 
-    fun setFunction(function: FrSlashFunction): FrCmd {
+    fun setFunction(function: FrSlashFunction): FrCommand {
         if (cmdStruct != Cmd)
             throw IllegalStateException("When use Subcommand, you cannot configure a Function to Command!")
 
@@ -100,7 +100,7 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
         return this
     }
 
-    fun setFunction(function: FrTextFunction): FrCmd {
+    fun setFunction(function: FrTextFunction): FrCommand {
         if (cmdStruct != Cmd)
             throw IllegalStateException("When use Subcommand, you cannot configure a Function to Command!")
 
@@ -108,7 +108,7 @@ class FrCmd(val name: String, val details: String, vararg val alias: String) {
         return this
     }
 
-    fun setChecks(checks: (FrCmdEvent) -> FrChecksResult): FrCmd {
+    fun setChecks(checks: (FrCmdEvent) -> FrChecksResult): FrCommand {
         this.checks.add(FrChecks { checks(it) })
         return this
     }
