@@ -27,12 +27,13 @@ dependencies {
     testImplementation(kotlin("test"))
 
     implementation("net.dv8tion:JDA:5.0.0-alpha.11")
-    implementation("com.github.minndevelopment:jda-ktx:9f01b74")
+    implementation("com.github.minndevelopment:jda-ktx:45f2776")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
     implementation("com.vdurmont:emoji-java:5.1.1")
 
     implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
+    implementation("com.github.ajalt.mordant:mordant:2.0.0-beta5")
     implementation("org.json:json:20220320")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("args4j:args4j:2.33")

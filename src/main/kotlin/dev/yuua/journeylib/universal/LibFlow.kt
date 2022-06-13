@@ -1,18 +1,21 @@
 package dev.yuua.journeylib.universal
 
-import dev.yuua.journeylib.universal.LibTermColor.RESET
+import com.github.ajalt.mordant.rendering.TextColors.*
+import com.github.ajalt.mordant.terminal.Terminal
 
 /**
  * ### ログを統一された書式で出力します。
  * @param globalName デフォルトで使用される出力名
  */
 class LibFlow(private val globalName: String? = null) {
-    enum class Type(val symbol: String, val color: String) {
-        HEADER(":", LibTermColor.BLUE_BRIGHT),
-        INFO("i", LibTermColor.PURPLE_BRIGHT),
-        TASK(">", LibTermColor.YELLOW_BRIGHT),
-        SUCCESS("+", LibTermColor.GREEN_BRIGHT),
-        FAILURE("#", LibTermColor.RED_BRIGHT)
+    val term = Terminal()
+
+    enum class Type(val symbol: String) {
+        HEADER(brightBlue(":")),
+        INFO(brightMagenta("i")),
+        TASK(brightYellow(">")),
+        SUCCESS(brightGreen("+")),
+        FAILURE(brightRed("#"))
     }
 
     /**
@@ -21,16 +24,16 @@ class LibFlow(private val globalName: String? = null) {
      * @param type 出力タイプ
      * @param context 内容
      */
-    private fun getFormatted(name: String, type: Type, context: String?): String {
-        return "|${type.color + type.symbol + RESET}|[${LibTermColor.BLACK_BRIGHT + name + RESET}] $context"
-    }
+    private fun getFormatted(name: String, type: Type, context: String?) =
+        "|${type.symbol}|[${gray(name)}] $context"
+
 
     /**
      * ### HEADERを出力します。
      * @param name 名前
      */
     fun header(name: String): LibFlow {
-        println(getFormatted(name, Type.HEADER, "==="))
+        term.println(getFormatted(name, Type.HEADER, "==="))
         return this
     }
 
@@ -40,7 +43,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun info(name: String? = null, context: String?): LibFlow {
-        println(getFormatted(name ?: globalName ?: "INFO", Type.INFO, context))
+        term.println(getFormatted(name ?: globalName ?: "INFO", Type.INFO, context))
         return this
     }
 
@@ -50,7 +53,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun info(context: String?): LibFlow {
-        println(getFormatted(globalName ?: "INFO", Type.INFO, context))
+        term.println(getFormatted(globalName ?: "INFO", Type.INFO, context))
         return this
     }
 
@@ -60,7 +63,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun task(name: String? = null, context: String?): LibFlow {
-        println(getFormatted(name ?: globalName ?: "TASK", Type.TASK, context))
+        term.println(getFormatted(name ?: globalName ?: "TASK", Type.TASK, context))
         return this
     }
 
@@ -70,7 +73,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun task(context: String?): LibFlow {
-        println(getFormatted(globalName ?: "TASK", Type.TASK, context))
+        term.println(getFormatted(globalName ?: "TASK", Type.TASK, context))
         return this
     }
 
@@ -80,7 +83,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun success(name: String? = null, context: String?): LibFlow {
-        println(getFormatted(name ?: globalName ?: "SUCCESS", Type.SUCCESS, context))
+        term.println(getFormatted(name ?: globalName ?: "SUCCESS", Type.SUCCESS, context))
         return this
     }
 
@@ -90,7 +93,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun success(context: String?): LibFlow {
-        println(getFormatted(globalName ?: "SUCCESS", Type.SUCCESS, context))
+        term.println(getFormatted(globalName ?: "SUCCESS", Type.SUCCESS, context))
         return this
     }
 
@@ -100,7 +103,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun failure(name: String? = null, context: String?): LibFlow {
-        println(getFormatted(name ?: globalName ?: "FAILURE", Type.FAILURE, context))
+        term.println(getFormatted(name ?: globalName ?: "FAILURE", Type.FAILURE, context))
         return this
     }
 
@@ -110,7 +113,7 @@ class LibFlow(private val globalName: String? = null) {
      * @param context 内容
      */
     fun failure(context: String?): LibFlow {
-        println(getFormatted(globalName ?: "FAILURE", Type.FAILURE, context))
+        term.println(getFormatted(globalName ?: "FAILURE", Type.FAILURE, context))
         return this
     }
 }

@@ -6,3 +6,5 @@ src/main/kotlin/dev/yuua/journeylib/main.kt
 config.struct.json
 config.json
 src/test/*
+src/main/kotlin/dev/yuua/journeylib/qnortz/TestKotlin.kt
+src/main/kotlin/dev/yuua/journeylib/qnortz/TestJava.java

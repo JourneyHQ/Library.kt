@@ -1,0 +1,53 @@
+package dev.yuua.journeylib.qnortz.functions.command.router
+
+import dev.yuua.journeylib.qnortz.functions.command.CommandRouter
+import dev.yuua.journeylib.qnortz.functions.command.CommandStructureType.*
+import dev.yuua.journeylib.qnortz.functions.command.builder.function.CommandFunction
+import dev.yuua.journeylib.qnortz.functions.command.builder.option.OptionAnalysisResult
+import dev.yuua.journeylib.qnortz.functions.command.builder.option.analyzeOptions
+
+fun analyzeTextCommand(prefix: String = ";", commandString: String, router: CommandRouter): Pair<CommandFunction, OptionAnalysisResult> {
+    // todo prefix config
+    if (!commandString.startsWith(prefix))
+        throw IllegalArgumentException("Command not starts with prefix!")
+
+    val commandRaw = commandString.substring(prefix.length).trim()
+    val args = commandRaw.split(" ")
+
+    val command = args[0]
+    var subcommandGroup: String? = null
+    var subcommand: String? = null
+
+    var optionRaw: String? = null
+
+    // Determine command structure type and extract options from command raw
+    when (router.inferType(command)) {
+        CommandType -> {
+            if (commandRaw.length > command.length)
+                optionRaw = commandRaw.substring("$command ".length)
+        }
+        SubcommandType -> {
+            subcommand = args[1]
+
+            val commandStructureRaw = "$command $subcommand"
+            if (commandRaw.length > commandStructureRaw.length)
+                optionRaw = commandRaw.substring("$commandRaw ".length)
+        }
+        SubcommandGroupType -> {
+            subcommandGroup = args[1]
+            subcommand = args[2]
+
+            val commandStructureRaw = "$command $subcommandGroup $subcommand"
+            if (commandRaw.length > commandStructureRaw.length)
+                optionRaw = commandRaw.substring("$commandStructureRaw ".length)
+        }
+    }
+
+    val route = CommandRoute(command, subcommandGroup, subcommand)
+
+    val commandFunction = router[route]
+
+    val options = analyzeOptions(optionRaw ?: "", commandFunction.options)
+
+    return commandFunction to options
+}
