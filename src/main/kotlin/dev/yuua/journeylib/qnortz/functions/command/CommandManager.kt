@@ -1,5 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command
 
+import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.Qnortz
 import dev.yuua.journeylib.qnortz.functions.FunctionRouter
 import dev.yuua.journeylib.qnortz.functions.ManagerStruct
@@ -9,8 +10,11 @@ import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteract
 import dev.yuua.journeylib.qnortz.functions.command.router.CommandRoute
 import dev.yuua.journeylib.qnortz.functions.functionClasses
 import dev.yuua.journeylib.qnortz.limit.LimitRouter
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+
+typealias TaskCoroutine = CoroutineScope.() -> Unit
 
 class CommandManager(
     override val qnortz: Qnortz,
@@ -49,55 +53,113 @@ class CommandManager(
             }
         }
 
-        val libFlow = qnortz.libFlow
-
-        libFlow.header("Public Commands Update")
+        val journal = qnortz.journal
 
         val router = CommandRouter()
 
+        for (publicCommand in publicCommands)
+            publicCommand.routes.forEach { (commandRoute, commandFunction) ->
+                if (qnortz.isDevEnv)
+                    commandRoute.command = qnortz.devPrefix + commandRoute.command // apply dev prefix
+                router[commandRoute] = commandFunction
+            }
+
+        for (guildCommand in guildCommands)
+            guildCommand.value.forEach {
+                it.routes.forEach { (commandRoute, commandFunction) ->
+                    if (qnortz.isDevEnv)
+                        commandRoute.command = qnortz.devPrefix + commandRoute.command // apply dev prefix
+                    router[commandRoute] = commandFunction
+                }
+            }
+
         runBlocking {
             // update public commands
-            val publicCommandUpdateTask = launch {
+            val publicCommandUpdateTask: TaskCoroutine = {
                 jda.updateCommands().addCommands(
-                    publicCommands.map {
-                        router.routes.putAll(it.routes)
-                        it.commandData
-                    }
+                    publicCommands.map { it.commandData }
                 ).queue({
-                    libFlow.success("Following public commands updated successfully:")
-                    it.forEach { command -> libFlow.success("${command.name}:${command.description}") }
+                    journal[Success](
+                        "Following public commands updated successfully :",
+                        *it.map { command -> "${command.name}:${command.description}" }.toTypedArray()
+                    )
                 }, {
-                    libFlow.failure("Updating public commands failed because of following reasons:")
+                    journal[Failure]("Updating public commands failed because of following reasons:")
                     throw it
                 })
             }
 
-            //update private commands
-            val privateCommandsUpdateTask = launch {
-                guildCommands.forEach { (guildId, privateCommands) ->
-                    val guild = jda.getGuildById(guildId)!!
+            val devPublicCommandUpdateTask: TaskCoroutine = {
+                for (guild in qnortz.devGuildList) {
                     guild.updateCommands().addCommands(
-                        privateCommands.map {
-                            router.routes.putAll(it.routes)
-                            it.commandData
+                        publicCommands.map {
+                            // apply dev prefix
+                            it.commandData.apply { name = qnortz.devPrefix + name }
                         }
                     ).queue({
-                        libFlow.success("Following private commands updated successfully:")
-                        it.forEach { command -> libFlow.success("${command.name}:${command.description} for ${guild.name}:${guild.id}") }
+                        journal[Success](
+                            "Following public commands updated successfully (dev) :",
+                            *it.map { command -> "${command.name}(${command.description})" }.toTypedArray()
+                        )
                     }, {
-                        libFlow.failure("Updating private commands failed because of following reasons:")
+                        journal[Failure]("Updating public commands failed because of following reasons:")
                         throw it
                     })
                 }
             }
 
-            publicCommandUpdateTask.join()
-            privateCommandsUpdateTask.join()
+            //update private commands
+            val privateCommandsUpdateTask: TaskCoroutine = {
+                for ((guildId, privateCommands) in guildCommands) {
+                    // dev-env && this guild is not a dev guild.
+                    if (qnortz.isDevEnv && !qnortz.devGuildList.map { it.id }.contains(guildId)) {
+                        journal[Info]("Guild($guildId) is not a dev guild. Skipping private command update...")
+                        continue
+                    }
+
+                    val guild = jda.getGuildById(guildId)
+                    if (guild == null) {
+                        journal[Failure]("Cannot resolve Guild($guildId). Skipping private command update...")
+                        continue
+                    }
+
+                    //clear private commands
+                    if (privateCommands.isEmpty()) {
+                        guild.updateCommands().queue()
+                        continue
+                    }
+
+                    guild.updateCommands().addCommands(
+                        privateCommands.map {
+                            it.commandData.apply {
+                                if (qnortz.isDevEnv)
+                                    name = qnortz.devPrefix + name
+                            }
+                        }
+                    ).queue({
+                        journal[Success](
+                            "Following private commands for ${guild.name}($guildId) updated successfully ${if (qnortz.isDevEnv) "(dev) " else ""}:",
+                            *it.map { command -> "${command.name}(${command.description})" }.toTypedArray()
+                        )
+                    }, {
+                        journal[Failure]("Updating private commands failed because of following reasons:")
+                        throw it
+                    })
+                }
+            }
+
+            if (!qnortz.isDevEnv)
+                launch(block = publicCommandUpdateTask)
+            else
+                launch(block = devPublicCommandUpdateTask)
+
+            launch(block = privateCommandsUpdateTask)
         }
 
         this.router = router
     }
 }
+
 
 class CommandRouter : FunctionRouter<CommandRoute, CommandFunction, CommandStructureType> {
     override val routes = hashMapOf<CommandRoute, CommandFunction>()

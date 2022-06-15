@@ -11,7 +11,6 @@ class LibFlow(private val globalName: String? = null) {
     val term = Terminal()
 
     enum class Type(val symbol: String) {
-        HEADER(brightBlue(":")),
         INFO(brightMagenta("i")),
         TASK(brightYellow(">")),
         SUCCESS(brightGreen("+")),
@@ -26,16 +25,6 @@ class LibFlow(private val globalName: String? = null) {
      */
     private fun getFormatted(name: String, type: Type, context: String?) =
         "|${type.symbol}|[${gray(name)}] $context"
-
-
-    /**
-     * ### HEADERを出力します。
-     * @param name 名前
-     */
-    fun header(name: String): LibFlow {
-        term.println(getFormatted(name, Type.HEADER, "==="))
-        return this
-    }
 
     /**
      * ### INFOを出力します。
@@ -116,4 +105,6 @@ class LibFlow(private val globalName: String? = null) {
         term.println(getFormatted(globalName ?: "FAILURE", Type.FAILURE, context))
         return this
     }
+
+    
 }

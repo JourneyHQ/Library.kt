@@ -1,6 +1,8 @@
 package dev.yuua.journeylib.qnortz
 
 import dev.minn.jda.ktx.jdabuilder.default
+import dev.yuua.journeylib.journal.Journal
+import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.functions.command.CommandManager
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import dev.yuua.journeylib.qnortz.functions.command.router.SlashCommandReactor
@@ -11,25 +13,27 @@ import dev.yuua.journeylib.qnortz.limit.Limit
 import dev.yuua.journeylib.qnortz.limit.LimitRouter
 import dev.yuua.journeylib.universal.LibFlow
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
 import net.dv8tion.jda.api.utils.MemberCachePolicy
 import net.dv8tion.jda.api.utils.cache.CacheFlag
 
 class Qnortz {
-    var libFlow: LibFlow
+    val journal: Journal
 
     lateinit var jda: JDA
     lateinit var name: String
     lateinit var token: String
     val intents = mutableListOf<GatewayIntent>()
 
-
     constructor(name: String, token: String, vararg intents: GatewayIntent) {
         this.name = name
         this.token = token
         this.intents.addAll(intents)
-        libFlow = LibFlow(name)
+        journal = Journal(name)
+
+        journal[Info]("Initializing $name...")
     }
 
     constructor(script: Qnortz.() -> Unit) {
@@ -41,7 +45,9 @@ class Qnortz {
         if (!::token.isInitialized)
             throw required("Token")
 
-        libFlow = LibFlow(name)
+        journal = Journal(name)
+
+        journal[Info]("Initializing $name...")
     }
 
     fun intents(vararg intents: GatewayIntent) {
@@ -71,6 +77,17 @@ class Qnortz {
         this.add(*events)
     }
 
+    var isDevEnv = false
+    lateinit var devPrefix: String
+    private val devGuildIdList = mutableListOf<String>()
+    val devGuildList = mutableListOf<Guild>()
+
+    fun devEnv(devPrefix: String, vararg devGuildIdList: String) {
+        isDevEnv = true
+        this.devPrefix = devPrefix
+        this.devGuildIdList.addAll(devGuildIdList)
+    }
+
     fun build() {
         build { }
     }
@@ -84,6 +101,19 @@ class Qnortz {
             setMemberCachePolicy(MemberCachePolicy.ALL)
             enableCache(CacheFlag.ONLINE_STATUS)
         }.awaitReady()
+
+        for (id in devGuildIdList) {
+            val devGuild = jda.getGuildById(id)
+            if (devGuild == null) {
+                journal[Failure]("Cannot resolve guild ($id)")
+            } else {
+                devGuildList.add(devGuild)
+            }
+        }
+        journal[Success](
+            "Following guilds added as dev guild :",
+            devGuildList.joinToString("\n") { "${it.name}(${it.id})" }
+        )
 
         QnortzInstances[name] = this
 
