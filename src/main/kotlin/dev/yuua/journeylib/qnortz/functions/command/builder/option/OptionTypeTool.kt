@@ -8,6 +8,11 @@ val channelRegex = Regex("<#(\\d+)>")
 val roleRegex = Regex("<@&(\\d+)>")
 val mentionableRegex = Regex("<@[&!]?(\\d+)>")
 
+/**
+ * Returns whether [value] is able to cast to [optionType].
+ * @param optionType expected [OptionType]
+ * @param value option value to check.
+ */
 fun matchType(optionType: OptionType, value: Any?): Boolean {
     val string = value.toString()
     return when (optionType) {

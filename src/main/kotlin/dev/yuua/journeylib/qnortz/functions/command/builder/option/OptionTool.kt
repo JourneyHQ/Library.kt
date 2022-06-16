@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 object OptionTool {
+
     inline fun <reified T> toChannelTypes(): List<ChannelType> {
         return when (T::class) {
             TextChannel::class -> listOf(ChannelType.TEXT)
@@ -20,10 +21,21 @@ object OptionTool {
                 ChannelType.GUILD_PRIVATE_THREAD,
                 ChannelType.GUILD_NEWS_THREAD
             )
+
             else -> emptyList()
         }
     }
 
+    /**
+     * Creates [OptionData].
+     * If [T] is of type channel, automatically configure channel types which accepts input from user.
+     *
+     * @param name name of option.
+     * @param description description of option.
+     * @param required whether option is required.
+     * @param autocomplete whether input autocomplete is available.
+     * @param builder lambda which applied to [OptionData]
+     */
     inline fun <reified T> option(
         name: String,
         description: String,
@@ -35,7 +47,8 @@ object OptionTool {
 
         // OptionType is CHANNEL and ChannelType is empty
         if (jdaOption.type == OptionType.CHANNEL
-            && jdaOption.channelTypes.isEmpty()) {
+            && jdaOption.channelTypes.isEmpty()
+        ) {
             jdaOption.setChannelTypes(toChannelTypes<T>())
         }
 

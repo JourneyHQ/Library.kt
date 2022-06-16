@@ -8,7 +8,7 @@ data class Limit<T>(
     val guilds: List<String> = emptyList(),
     val channels: List<String> = emptyList(),
     val users: List<String> = emptyList(),
-    val rule: RulesFunction<T> = RulesFunction { RulesResult(type = RulesResultType.PASSED) }
+    val rule: RulesFunction<T> = RulesFunction { RulesResult(type = RulesResultType.Passed) }
 ) {
     fun isNotEmpty() = !(guilds.isEmpty() && users.isEmpty())
 }

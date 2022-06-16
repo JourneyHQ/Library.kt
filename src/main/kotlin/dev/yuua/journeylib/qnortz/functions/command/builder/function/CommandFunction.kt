@@ -5,7 +5,17 @@ import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
+import dev.yuua.journeylib.qnortz.rules.RulesResultType.Passed
 
+/**
+ * Data class which holds data of the commands' instance.
+ *
+ * @param slashFunction [SlashFunction] to execute. Cannot hold with [textFunction].
+ * @param textFunction [TextFunction] to execute. Cannot hold with [slashFunction].
+ * @param options List of [OptionData].
+ * @param rules List of [RulesFunction]. All results must be [Passed] to execute the command.
+ * @param acceptedOn List of [ChannelType] on which this command can be executed.
+ */
 data class CommandFunction(
     val slashFunction: SlashFunction?,
     val textFunction: TextFunction?,

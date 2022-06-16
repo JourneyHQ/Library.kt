@@ -49,7 +49,7 @@ class SlashCommandReactor(private val manager: CommandManager) : EventStruct {
             // rule : access control per command
             for (rules in commandFunction.rules) {
                 val ruleResult = rules.execute(unifiedEvent)
-                if (ruleResult.type != RulesResultType.PASSED) {
+                if (ruleResult.type != RulesResultType.Passed) {
                     it.reply_(
                         embed = Embed {
                             title = ":interrobang: ${ruleResult.type.title}"

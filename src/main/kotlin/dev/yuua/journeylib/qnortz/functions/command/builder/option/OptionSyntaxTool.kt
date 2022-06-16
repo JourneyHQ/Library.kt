@@ -3,12 +3,21 @@ package dev.yuua.journeylib.qnortz.functions.command.builder.option
 import dev.yuua.journeylib.universal.LibString.trimQuote
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
-
+/**
+ * Result of [analyzeOptions]
+ * @param options detected options.
+ * @param message error message which displayed if there are invalid syntax.
+ */
 data class OptionAnalysisResult(
     val options: MutableList<UnifiedOption> = mutableListOf(),
     val message: String? = null
 )
 
+/**
+ * Analyzes options of TextCommand.
+ * @param text option part of command string.
+ * @param optionDataList list of [OptionData] for determining if option syntax is correct.
+ */
 fun analyzeOptions(text: String, optionDataList: List<OptionData>): OptionAnalysisResult {
     val optionNameRegex = Regex("[\\w-]{1,32}")
 

@@ -22,7 +22,7 @@ inline fun <reified T> Limit<T>.check(
         val guildRestricted = guilds.isNotEmpty() && !guilds.contains(guild?.id)
         val channelsRestricted = channels.isNotEmpty() && !channels.contains(channel.id)
         val userRestricted = users.isNotEmpty() && !users.contains(user.id)
-        val ruleRestricted = ruleResult.type != RulesResultType.PASSED
+        val ruleRestricted = ruleResult.type != RulesResultType.Passed
 
         val restricted = guildRestricted || channelsRestricted || userRestricted || ruleRestricted
 

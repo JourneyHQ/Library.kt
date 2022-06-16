@@ -6,7 +6,6 @@ import dev.minn.jda.ktx.messages.reply_
 import dev.yuua.journeylib.qnortz.QnortzColor
 import dev.yuua.journeylib.qnortz.codeBlock
 import dev.yuua.journeylib.qnortz.functions.command.CommandManager
-import dev.yuua.journeylib.qnortz.functions.command.CommandRouter
 import dev.yuua.journeylib.qnortz.functions.command.event.toUnified
 import dev.yuua.journeylib.qnortz.functions.event.EventStruct
 import dev.yuua.journeylib.qnortz.limit.check
@@ -91,7 +90,7 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             // rule : access control per command
             for (rules in commandFunction.rules) {
                 val ruleResult = rules.execute(unifiedEvent)
-                if (ruleResult.type != RulesResultType.PASSED) {
+                if (ruleResult.type != RulesResultType.Passed) {
                     message.reply_(
                         embed = Embed {
                             title = ":interrobang: ${ruleResult.type.title}"

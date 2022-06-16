@@ -3,6 +3,9 @@ package dev.yuua.journeylib.qnortz.functions.command.builder.option
 import net.dv8tion.jda.api.interactions.commands.OptionMapping
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
+/**
+ * Option that capable with both SlashCommand and TextCommand.
+ */
 class UnifiedOption {
     private var hasInitialized = false
 
