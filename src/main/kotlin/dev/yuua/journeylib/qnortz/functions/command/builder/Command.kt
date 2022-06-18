@@ -16,16 +16,29 @@ import net.dv8tion.jda.api.entities.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
+import dev.yuua.journeylib.qnortz.rules.RulesResultType
 
 class Command {
     val name: String
     val description: String
 
+    /**
+     * Creates [Command] instance. (for Java)
+     * @param name The name of the command.
+     * @param description The description of the command.
+     */
     constructor(name: String, description: String) {
         this.name = name
         this.description = description
     }
 
+    /**
+     * Creates [Command] instance. (for Kotlin)
+     *
+     * @param name The name of the command.
+     * @param description The description of the command.
+     * @param script The script which is applied to [Command].
+     */
     constructor(name: String, description: String, script: Command.() -> Unit) {
         this.name = name
         this.description = description
@@ -45,91 +58,163 @@ class Command {
 
     var rulesFunction: RulesFunction<UnifiedCommandInteractionEvent>? = null
 
-    // Java
+    /**
+     * Adds subcommands to the command. (for Java)
+     *
+     * @param commands Subcommands to add.
+     */
     fun subcommands(vararg commands: Subcommand): Command {
         subcommands.addAll(commands)
         structureType = SubcommandType
         return this
     }
 
-    // Kotlin DSL
+    /**
+     * Adds the subcommand to the command. (for Kotlin)
+     *
+     * @param name The name of the subcommand.
+     * @param description The description of the subcommand.
+     * @param script The script which is applied to [Subcommand].
+     */
     fun subcommand(name: String, description: String, script: Subcommand.() -> Unit) {
         subcommands.add(Subcommand(name, description, script))
         structureType = SubcommandType
     }
 
-    // Java
+    /**
+     * Adds subcommand groups to the command. (for Java)
+     *
+     * @param commands SubcommandGroups to add.
+     */
     fun subcommandGroups(vararg commands: SubcommandGroup): Command {
         subcommandGroups.addAll(commands)
         structureType = SubcommandGroupType
         return this
     }
 
-    // Kotlin DSL
+    /**
+     * Adds the subcommand group to the command. (for Kotlin)
+     *
+     * @param name The name of the subcommand group.
+     * @param description The description of the subcommand group.
+     * @param script The script which is applied to [SubcommandGroup].
+     */
     fun subcommandGroup(name: String, description: String, script: SubcommandGroup.() -> Unit) {
         subcommandGroups.add(SubcommandGroup(name, description, script))
         structureType = SubcommandGroupType
     }
 
+    /**
+     * Adds options to the command. (for Java)
+     *
+     * @param options Options of the command.
+     */
     fun options(vararg options: OptionData) {
         this.jdaOptions.addAll(options)
     }
 
+    /**
+     * Adds the option to the command. (for Kotlin)
+     *
+     * @param name The name of the command.
+     * @param description The description of the command.
+     * @param required Whether the option is required or not.
+     * @param autocomplete Whether the option supports auto-complete.
+     * @param script The script which is applied to [OptionData]
+     */
     inline fun <reified T> option(
         name: String,
         description: String,
         required: Boolean = false,
         autocomplete: Boolean = false,
-        builder: OptionData.() -> Unit = {}
+        script: OptionData.() -> Unit = {}
     ) {
-        val jdaOption = OptionTool.option<T>(name, description, required, autocomplete, builder)
+        val jdaOption = OptionTool.option<T>(name, description, required, autocomplete, script)
         jdaOptions.add(jdaOption)
     }
 
-    // Kotlin DSL
+    /**
+     * Adds the function to the command. (for Kotlin)
+     * It only supports slash-command.
+     *
+     * @param function The function to run.
+     */
     fun slashFunction(function: SlashCommandInteractionEvent.() -> Unit) {
         slashFunction = SlashFunction {
             function(it)
         }
     }
 
-    // Java
+    /**
+     * Adds the function to the command. (for Java)
+     * It only supports slash-command.
+     *
+     * @param function The function to run.
+     */
     fun slashFunction(function: SlashFunction): Command {
         slashFunction = function
         return this
     }
 
-    // Kotlin DSL
+    /**
+     * Adds the function to the command. (for Kotlin)
+     * It supports both text-command and slash-command.
+     *
+     * @param function The function to run.
+     */
     fun textFunction(function: UnifiedCommandInteractionEvent.() -> Unit) {
         textFunction = TextFunction {
             function(it)
         }
     }
 
-    // Java
+    /**
+     * Adds the function to the command. (for Java)
+     * It supports both text-command and slash-command.
+     *
+     * @param function The function to run.
+     */
     fun textFunction(function: TextFunction): Command {
         textFunction = function
         return this
     }
 
-    // Kotlin DSL
+    /**
+     * Adds the rules function to the command. (for Kotlin)
+     * To use the command, [RulesResultType] must be [RulesResultType.Passed]
+     *
+     * @param script The script to control access.
+     */
     fun rules(script: UnifiedCommandInteractionEvent.() -> RulesResult) {
         rulesFunction = RulesFunction {
             script(it)
         }
     }
 
-    // Java
+    /**
+     * Adds the rules function to the command. (for Java)
+     * To use the command, [RulesResultType] must be [RulesResultType.Passed]
+     *
+     * @param script The script to control access.
+     */
     fun rules(script: RulesFunction<UnifiedCommandInteractionEvent>): Command {
         rulesFunction = script
         return this
     }
 
+    /**
+     * Make the command can be executed on specified [ChannelType].
+     *
+     * @param channelType Channel types that the command accepts.
+     */
     fun acceptedOn(vararg channelType: ChannelType): Command {
         acceptedOn.addAll(channelType)
         return this
     }
 
+    /**
+     * Creates [CommandObject]
+     */
     fun build(): CommandObject {
         val routes = hashMapOf<CommandRoute, CommandFunction>()
         lateinit var command: SlashCommandData
