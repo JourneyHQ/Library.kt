@@ -12,6 +12,20 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 
+/**
+ * Command interaction event which supports both [SlashCommandInteractionEvent] and [MessageReceivedEvent].
+ *
+ * @param jda JDA.
+ * @param guild The guild which the event fired.
+ * @param isFromGuild Whether the event fired on guild or not.
+ * @param isFromThread Whether the event fired on thread or not.
+ * @param channel The channel which the event fired.
+ * @param channelType The type of [channel]
+ * @param member The member who executed the command. If [isFromGuild] is false, this will be null.
+ * @param user The user who executed the command.
+ * @param jdaEvent Data class which stores original event.
+ * @param options Options provided by user.
+ */
 data class UnifiedCommandInteractionEvent(
     val jda: JDA,
     val guild: Guild?,
@@ -27,6 +41,15 @@ data class UnifiedCommandInteractionEvent(
     private val slash = jdaEvent.slashCommandInteractionEvent
     private val text = jdaEvent.messageReceivedEvent
 
+    /**
+     * Reply to user. (for Kotlin)
+     *
+     * @param content The string message to send.
+     * @param embed The single embed to send.
+     * @param embeds Multiple embeds to send.
+     * @param file The single file to send.
+     * @param files Multiple files to reply.
+     */
     fun reply(
         content: String? = null,
         embed: MessageEmbed? = null,
@@ -44,17 +67,28 @@ data class UnifiedCommandInteractionEvent(
                 .toUnifiedReplyActionDispatcher()
     }
 
-    fun reply(message: MessageEmbed, vararg messages: MessageEmbed) =
+    /**
+     * Reply to user with embeds.
+     *
+     * @param embed The single embed to send.
+     * @param embeds Multiple embeds to send.
+     */
+    fun reply(embed: MessageEmbed, vararg embeds: MessageEmbed) =
         when (jdaEvent.type) {
             CommandFromType.SlashCommand ->
-                slash!!.reply_(embed = message, embeds = messages.toList())
+                slash!!.reply_(embed = embed, embeds = embeds.toList())
                     .toUnifiedReplyActionDispatcher()
 
             CommandFromType.TextCommand ->
-                text!!.message.reply_(embed = message, embeds = messages.toList())
+                text!!.message.reply_(embed = embed, embeds = embeds.toList())
                     .toUnifiedReplyActionDispatcher()
         }
 
+    /**
+     * Reply to user with message.
+     *
+     * @param content The message to send.
+     */
     fun reply(content: String) =
         when (jdaEvent.type) {
             CommandFromType.SlashCommand ->
@@ -64,14 +98,17 @@ data class UnifiedCommandInteractionEvent(
                 text!!.message.reply_(content).toUnifiedReplyActionDispatcher()
         }
 
-
     fun extractId(regex: Regex, value: String) =
         regex.find(value)?.groupValues?.get(1)
             ?: throw IllegalArgumentException("ID could not be extracted from the value provided!")
 
-
-    // switch method by option is required or not. option / optionOrNull
-
+    /**
+     * Returns option which has specified [name]. If no such option exists, returns null.
+     *
+     * @param T The type of the option.
+     * @param name The name of the option.
+     * @param guild The guild to resolve member id and role. This will be the guild which the event fired by default.
+     */
     inline fun <reified T> optionOrNull(name: String, guild: Guild? = this.guild): T? {
         val option = options.firstOrNull { it.name == name }
 
@@ -82,13 +119,24 @@ data class UnifiedCommandInteractionEvent(
         return typeCast<T>(optionValue, guild)
     }
 
+    /**
+     * Returns option which has specified [name]. If no such option exists, throws [IllegalArgumentException].
+     *
+     * @param T The type of the option.
+     * @param name The name of the option.
+     * @param guild The guild to resolve member id and role. This will be the guild which the event fired by default.
+     */
     inline fun <reified T> option(name: String, guild: Guild? = this.guild) = optionOrNull<T>(name, guild)
         ?: throw IllegalArgumentException("Option value is null!")
 
+    /**
+     * Returns value which cast to [T] if possible.
+     *
+     * @param value The value to cast.
+     * @param guild The guild to resolve member id and role.
+     */
     inline fun <reified T> typeCast(value: Any?, guild: Guild?): T? {
         if (value == null) return value
-
-        println(value)
 
         val string = value.toString()
 
@@ -136,12 +184,13 @@ data class UnifiedCommandInteractionEvent(
             else -> throw IllegalStateException("OptionType - Class mismatch!")
         }
 
-        println(returnValue)
-
         return returnValue as T?
     }
 }
 
+/**
+ * Makes [UnifiedCommandInteractionEvent] from [SlashCommandInteractionEvent].
+ */
 fun SlashCommandInteractionEvent.toUnified() = UnifiedCommandInteractionEvent(
     jda, guild, isFromGuild, channelType.isThread,
     channel, channelType, member, user,
@@ -149,7 +198,9 @@ fun SlashCommandInteractionEvent.toUnified() = UnifiedCommandInteractionEvent(
     options.map { UnifiedOption(it) }
 )
 
-
+/**
+ * Makes [UnifiedCommandInteractionEvent] from [MessageReceivedEvent]
+ */
 fun MessageReceivedEvent.toUnified(options: List<UnifiedOption>) = UnifiedCommandInteractionEvent(
     jda, guild, isFromGuild, channelType.isThread,
     channel, channelType, member, author,

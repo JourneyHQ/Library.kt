@@ -6,6 +6,9 @@ import dev.yuua.journeylib.qnortz.functions.functionClasses
 import dev.yuua.journeylib.qnortz.limit.LimitRouter
 import net.dv8tion.jda.api.events.GenericEvent
 
+/**
+ * Manages event classes.
+ */
 class EventManager(
     override val qnortz: Qnortz,
     override val functionPackage: String,

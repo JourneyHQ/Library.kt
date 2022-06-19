@@ -16,6 +16,13 @@ import kotlinx.coroutines.runBlocking
 
 typealias TaskCoroutine = CoroutineScope.() -> Unit
 
+/**
+ * Manages command classes.
+ *
+ * @param qnortz Qnortz instance.
+ * @param functionPackage The package on which command classes placed.
+ * @param limitRouter [LimitRouter] for per-package limitation.
+ */
 class CommandManager(
     override val qnortz: Qnortz,
     override val functionPackage: String,
@@ -30,6 +37,9 @@ class CommandManager(
 
     lateinit var router: CommandRouter
 
+    /**
+     * Initializes [CommandManager] and registers commands to Discord.
+     */
     override fun init() {
         val jda = qnortz.jda
 

@@ -6,6 +6,15 @@ import dev.yuua.journeylib.qnortz.functions.command.builder.function.CommandFunc
 import dev.yuua.journeylib.qnortz.functions.command.builder.option.OptionAnalysisResult
 import dev.yuua.journeylib.qnortz.functions.command.builder.option.analyzeOptions
 
+/**
+ * Analyzes string command.
+ *
+ * @param prefix Prefix.
+ * @param commandString String of the command. ex: ";ping yuua"
+ * @param router [CommandRouter].
+ *
+ * @return Pair of [CommandFunction] and [OptionAnalysisResult].
+ */
 fun analyzeTextCommand(prefix: String = ";", commandString: String, router: CommandRouter): Pair<CommandFunction, OptionAnalysisResult> {
     // todo prefix config
     if (!commandString.startsWith(prefix))

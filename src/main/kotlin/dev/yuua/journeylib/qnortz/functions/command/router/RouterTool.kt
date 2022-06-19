@@ -5,13 +5,6 @@ import dev.yuua.journeylib.qnortz.QnortzColor
 import dev.yuua.journeylib.qnortz.codeBlock
 import net.dv8tion.jda.api.entities.ChannelType
 
-fun acceptedChannelTypesRule(acceptedOn: List<ChannelType>, channelType: ChannelType, script: () -> Unit): Boolean {
-    val accepted = acceptedOn.contains(channelType)
-    if (!accepted) script()
-
-    return accepted
-}
-
 fun invalidChannelTypeEmbed(acceptedOn: List<ChannelType>) =
     Embed {
         title = ":interrobang: Invalid Channel Type!"

@@ -4,6 +4,14 @@ import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
+/**
+ * Data class which holds both [SlashCommandInteractionEvent] and [MessageReceivedEvent].
+ *
+ * @param slashCommandInteractionEvent [SlashCommandInteractionEvent].
+ * @param messageReceivedEvent [MessageReceivedEvent].
+ *
+ * @throws IllegalArgumentException When both of them is null or nonnull.
+ */
 data class CommandInteraction(
     val slashCommandInteractionEvent: SlashCommandInteractionEvent?,
     val messageReceivedEvent: MessageReceivedEvent?

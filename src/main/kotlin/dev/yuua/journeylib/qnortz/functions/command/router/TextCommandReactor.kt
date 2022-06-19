@@ -13,6 +13,11 @@ import dev.yuua.journeylib.qnortz.rules.RulesResultType
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
+/**
+ * The router of text command.
+ *
+ * @param manager [CommandManager].
+ */
 class TextCommandReactor(private val manager: CommandManager) : EventStruct {
     override val script: JDA.() -> Unit = {
         listener<MessageReceivedEvent> {
@@ -53,6 +58,7 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             }
 
             // todo guild only function
+            // todo ↑ filter? (bool)
 
             // cancel command execution if this channel cannot be accepted.
             val acceptedOn = commandFunction.acceptedOn
