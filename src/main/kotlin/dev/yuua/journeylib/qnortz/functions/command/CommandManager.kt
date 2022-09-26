@@ -1,5 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command
 
+import dev.minn.jda.ktx.interactions.commands.updateCommands
 import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.Qnortz
 import dev.yuua.journeylib.qnortz.functions.FunctionRouter
@@ -45,7 +46,7 @@ class CommandManager(
 
         val publicCommands = mutableListOf<CommandObject>()
         val guildCommands = hashMapOf<String, MutableList<CommandObject>>()
-        //init guildCommands
+        // initialize guilds for guild commands
         jda.guilds.forEach {
             guildCommands[it.id] = mutableListOf()
         }
@@ -55,11 +56,11 @@ class CommandManager(
             val limit = limitRouter[packageName]
             val commandObject = it.command
 
-            if (limit.guilds.isEmpty()) {
+            if (limit.guildIds.isEmpty()) {
                 publicCommands.add(commandObject)
             } else {
-                for (guild in limit.guilds)
-                    guildCommands[guild]!!.add(commandObject) // !! -> already initialized
+                for (guildId in limit.guildIds)
+                    guildCommands[guildId]!!.add(commandObject) // !! -> already initialized
             }
         }
 
@@ -90,7 +91,7 @@ class CommandManager(
                     publicCommands.map { it.commandData }
                 ).queue({
                     journal[Success](
-                        "Following public commands updated successfully :",
+                        "Following public commands updated successfully:",
                         *it.map { command -> "${command.name}:${command.description}" }.toTypedArray()
                     )
                 }, {
@@ -100,15 +101,17 @@ class CommandManager(
             }
 
             val devPublicCommandUpdateTask: TaskCoroutine = {
+                val devPublicCommands = publicCommands.map {
+                    // apply dev prefix
+                    it.commandData.apply { name = qnortz.devPrefix + name }
+                }
+
                 for (guild in qnortz.devGuildList) {
-                    guild.updateCommands().addCommands(
-                        publicCommands.map {
-                            // apply dev prefix
-                            it.commandData.apply { name = qnortz.devPrefix + name }
-                        }
-                    ).queue({
+                    guild.updateCommands {
+                        addCommands(devPublicCommands)
+                    }.queue({
                         journal[Success](
-                            "Following public commands updated successfully (dev) :",
+                            "Following public commands updated successfully (dev/${guild.name}):",
                             *it.map { command -> "${command.name}(${command.description})" }.toTypedArray()
                         )
                     }, {
@@ -133,17 +136,12 @@ class CommandManager(
                         continue
                     }
 
-                    //clear private commands
-                    if (privateCommands.isEmpty()) {
-                        guild.updateCommands().queue()
-                        continue
-                    }
+                    if (privateCommands.isEmpty()) continue
 
                     guild.updateCommands().addCommands(
                         privateCommands.map {
                             it.commandData.apply {
-                                if (qnortz.isDevEnv)
-                                    name = qnortz.devPrefix + name
+                                if (qnortz.isDevEnv) name = qnortz.devPrefix + name
                             }
                         }
                     ).queue({
@@ -158,11 +156,9 @@ class CommandManager(
                 }
             }
 
-            if (!qnortz.isDevEnv)
-                launch(block = publicCommandUpdateTask)
-            else
-                launch(block = devPublicCommandUpdateTask)
+            jda.guilds.filter { guildCommands[it.id]!!.isEmpty() }.forEach { it.updateCommands().complete() }
 
+            launch(block = if (!qnortz.isDevEnv) publicCommandUpdateTask else devPublicCommandUpdateTask)
             launch(block = privateCommandsUpdateTask)
         }
 

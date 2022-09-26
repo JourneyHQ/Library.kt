@@ -1,10 +1,13 @@
 package dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply
 
-import dev.minn.jda.ktx.messages.*
+import dev.minn.jda.ktx.messages.edit
+import dev.minn.jda.ktx.messages.editMessage
 import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.interactions.InteractionHook
+import net.dv8tion.jda.api.interactions.components.LayoutComponent
+import net.dv8tion.jda.api.utils.FileUpload
 
 data class UnifiedEditAction(
     val interaction: InteractionHook? = null,
@@ -28,21 +31,19 @@ data class UnifiedEditAction(
 
     fun edit(
         content: String? = null,
-        embed: MessageEmbed? = null,
-        embeds: Embeds? = null,
-        components: Components? = null,
-        file: NamedFile? = null,
-        files: Files? = null,
+        embeds: Collection<MessageEmbed> = emptyList(),
+        components: Collection<LayoutComponent> = emptyList(),
+        files: Collection<FileUpload> = emptyList(),
         replace: Boolean = false
     ) = when (type) {
         CommandFromType.SlashCommand -> {
             val webhookMessageUpdateAction =
-                interaction!!.editMessage("@original", content, embed, embeds, components, file, files, replace)
+                interaction!!.editMessage("@original", content, embeds, components, files, replace)
             webhookMessageUpdateAction.toUnifiedEditActionDispatcher()
         }
 
         CommandFromType.TextCommand -> {
-            val messageAction = message!!.edit(content, embed, embeds, components, file, files, replace)
+            val messageAction = message!!.edit(content, embeds, components, files, replace)
             messageAction.toUnifiedEditActionDispatcher()
         }
     }

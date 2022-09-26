@@ -3,8 +3,8 @@ package dev.yuua.journeylib.qnortz.limit
 import dev.yuua.journeylib.qnortz.functions.FunctionType
 import dev.yuua.journeylib.qnortz.rules.RulesResultType
 import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.entities.MessageChannel
 import net.dv8tion.jda.api.entities.User
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 
 inline fun <reified T> limits(basePackage: String, vararg limits: Pair<String, Limit<T>>) =
     LimitRouter(basePackage, listOf(*limits))
@@ -19,9 +19,9 @@ inline fun <reified T> Limit<T>.check(
     if (this.isNotEmpty()) {
         val ruleResult = rule.execute(event)
 
-        val guildRestricted = guilds.isNotEmpty() && !guilds.contains(guild?.id)
-        val channelsRestricted = channels.isNotEmpty() && !channels.contains(channel.id)
-        val userRestricted = users.isNotEmpty() && !users.contains(user.id)
+        val guildRestricted = guildIds.isNotEmpty() && !guildIds.contains(guild?.id)
+        val channelsRestricted = channelIds.isNotEmpty() && !channelIds.contains(channel.id)
+        val userRestricted = userIds.isNotEmpty() && !userIds.contains(user.id)
         val ruleRestricted = ruleResult.type != RulesResultType.Passed
 
         val restricted = guildRestricted || channelsRestricted || userRestricted || ruleRestricted

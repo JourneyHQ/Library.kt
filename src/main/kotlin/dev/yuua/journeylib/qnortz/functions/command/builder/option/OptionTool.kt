@@ -2,6 +2,9 @@ package dev.yuua.journeylib.qnortz.functions.command.builder.option
 
 import dev.minn.jda.ktx.interactions.commands.Option
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.entities.channel.concrete.*
+import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
@@ -46,11 +49,8 @@ object OptionTool {
         val jdaOption = Option<T>(name, description, required, autocomplete, builder)
 
         // OptionType is CHANNEL and ChannelType is empty
-        if (jdaOption.type == OptionType.CHANNEL
-            && jdaOption.channelTypes.isEmpty()
-        ) {
+        if (jdaOption.type == OptionType.CHANNEL && jdaOption.channelTypes.isEmpty())
             jdaOption.setChannelTypes(toChannelTypes<T>())
-        }
 
         return jdaOption
     }

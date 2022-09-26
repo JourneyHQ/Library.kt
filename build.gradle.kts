@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.20"
+    kotlin("jvm") version "1.7.10"
     `maven-publish`
 }
 
@@ -26,8 +26,8 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.11")
-    implementation("com.github.minndevelopment:jda-ktx:45f2776")
+    implementation("net.dv8tion:JDA:5.0.0-alpha.19")
+    implementation("com.github.minndevelopment:jda-ktx:fc7d7de")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
     implementation("com.vdurmont:emoji-java:5.1.1")
@@ -44,7 +44,6 @@ dependencies {
     implementation("io.ktor:ktor-client-core:2.0.0")
     implementation("io.ktor:ktor-client-cio:2.0.0")
     implementation("org.jraf:klibnotion:1.11.0")
-
 }
 
 tasks.test {

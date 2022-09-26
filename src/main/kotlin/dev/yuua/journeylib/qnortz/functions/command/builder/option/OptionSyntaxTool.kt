@@ -21,15 +21,10 @@ data class OptionAnalysisResult(
 fun analyzeOptions(text: String, optionDataList: List<OptionData>): OptionAnalysisResult {
     val optionNameRegex = Regex("[\\w-]{1,32}")
 
-    // value
-    val optionRegex = Regex("[^ ]+")
-    // "value"
-    val optionWithQuoteRegex = Regex("\"(?:[^\\\\\"]|\\\\\\\\|\\\\\")*\"")
-    // option=value
-    val namedOptionRegex = Regex("($optionNameRegex)=($optionRegex)")
-    // option="value"
-    val namedOptionWithQuoteRegex = Regex("($optionNameRegex)=($optionWithQuoteRegex)")
-
+    val optionRegex = Regex("[^ ]+") // value
+    val optionWithQuoteRegex = Regex("\"(?:[^\\\\\"]|\\\\\\\\|\\\\\")*\"") // "value"
+    val namedOptionRegex = Regex("($optionNameRegex)=($optionRegex)") // option=value
+    val namedOptionWithQuoteRegex = Regex("($optionNameRegex)=($optionWithQuoteRegex)") // option="value"
 
     val allRegex = Regex("($namedOptionWithQuoteRegex)|($namedOptionRegex)|($optionWithQuoteRegex)|($optionRegex)")
 
@@ -113,7 +108,9 @@ fun analyzeOptions(text: String, optionDataList: List<OptionData>): OptionAnalys
     for (optionData in optionDataList) {
         val option = options.firstOrNull { it.name == optionData.name } ?: continue
         if (!matchType(optionData.type, option.value))
-            return OptionAnalysisResult(message = "Option: ${optionData.name}(${option.value}) type is not valid.\n${optionData.type} expected.")
+            return OptionAnalysisResult(
+                message = "Invalid option type found: ${optionData.name}(${option.value}).\n${optionData.type} expected."
+            )
     }
 
     return OptionAnalysisResult(options)

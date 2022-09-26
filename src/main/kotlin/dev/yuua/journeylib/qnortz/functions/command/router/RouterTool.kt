@@ -3,7 +3,7 @@ package dev.yuua.journeylib.qnortz.functions.command.router
 import dev.minn.jda.ktx.messages.Embed
 import dev.yuua.journeylib.qnortz.QnortzColor
 import dev.yuua.journeylib.qnortz.codeBlock
-import net.dv8tion.jda.api.entities.ChannelType
+import net.dv8tion.jda.api.entities.channel.ChannelType
 
 fun invalidChannelTypeEmbed(acceptedOn: List<ChannelType>) =
     Embed {

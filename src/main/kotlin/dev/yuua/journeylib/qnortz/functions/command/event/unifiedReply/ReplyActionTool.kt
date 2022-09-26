@@ -2,15 +2,16 @@ package dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply
 
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.interactions.InteractionHook
-import net.dv8tion.jda.api.requests.restaction.MessageAction
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
 
 fun ReplyCallbackAction.toUnifiedReplyActionDispatcher() =
     UnifiedReplyActionDispatcher(replyCallbackAction = this)
 
-fun MessageAction.toUnifiedReplyActionDispatcher() =
-    UnifiedReplyActionDispatcher(messageAction = this)
+fun MessageCreateAction.toUnifiedReplyActionDispatcher() =
+    UnifiedReplyActionDispatcher(messageCreateAction = this)
 
 fun InteractionHook.toUnifiedEditAction() =
     UnifiedEditAction(interaction = this)
@@ -18,8 +19,8 @@ fun InteractionHook.toUnifiedEditAction() =
 fun Message.toUnifiedEditAction() =
     UnifiedEditAction(message = this)
 
-fun WebhookMessageUpdateAction<Message>.toUnifiedEditActionDispatcher() =
+fun WebhookMessageEditAction<Message>.toUnifiedEditActionDispatcher() =
     UnifiedEditActionDispatcher(webhookMessageAction = this)
 
-fun MessageAction.toUnifiedEditActionDispatcher() =
+fun MessageEditAction.toUnifiedEditActionDispatcher() =
     UnifiedEditActionDispatcher(messageAction = this)

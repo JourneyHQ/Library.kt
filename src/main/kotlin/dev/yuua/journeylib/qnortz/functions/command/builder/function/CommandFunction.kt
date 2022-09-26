@@ -1,11 +1,11 @@
 package dev.yuua.journeylib.qnortz.functions.command.builder.function
 
-import dev.yuua.journeylib.qnortz.rules.RulesFunction
 import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
-import net.dv8tion.jda.api.entities.ChannelType
-import net.dv8tion.jda.api.interactions.commands.build.OptionData
+import dev.yuua.journeylib.qnortz.rules.RulesFunction
 import dev.yuua.journeylib.qnortz.rules.RulesResultType.Passed
+import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 /**
  * Data class which holds data of the commands' instance.
@@ -36,7 +36,6 @@ data class CommandFunction(
     init {
         if ((slashFunction != null && textFunction != null) || (slashFunction == null && textFunction == null))
             throw illegalArgs
-
         packageName = when (type) {
             CommandFromType.TextCommand -> textFunction!!::class.java.packageName
             CommandFromType.SlashCommand -> slashFunction!!::class.java.packageName

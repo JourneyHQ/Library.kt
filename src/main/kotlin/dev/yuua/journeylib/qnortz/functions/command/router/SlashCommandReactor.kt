@@ -2,7 +2,6 @@ package dev.yuua.journeylib.qnortz.functions.command.router
 
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.messages.Embed
-import dev.minn.jda.ktx.messages.reply_
 import dev.yuua.journeylib.qnortz.QnortzColor
 import dev.yuua.journeylib.qnortz.codeBlock
 import dev.yuua.journeylib.qnortz.functions.command.CommandFromType.SlashCommand
@@ -32,7 +31,7 @@ class SlashCommandReactor(private val manager: CommandManager) : EventStruct {
             // cancel command execution if this channel cannot be accepted.
             val acceptedOn = commandFunction.acceptedOn
             if (acceptedOn.isNotEmpty() && !acceptedOn.contains(it.channelType)) {
-                it.reply_(embed = invalidChannelTypeEmbed(acceptedOn)).queue()
+                it.replyEmbeds(invalidChannelTypeEmbed(acceptedOn)).queue()
                 return@listener
             }
 
@@ -45,9 +44,7 @@ class SlashCommandReactor(private val manager: CommandManager) : EventStruct {
             val (passed, checkResultMessage) =
                 limit.check(unifiedEvent, it.guild, it.channel, it.user, false)
             if (!passed) {
-                it.reply_(
-                    embed = accessForbiddenEmbed(checkResultMessage)
-                ).queue()
+                it.replyEmbeds(accessForbiddenEmbed(checkResultMessage)).queue()
                 return@listener
             }
 
@@ -55,25 +52,18 @@ class SlashCommandReactor(private val manager: CommandManager) : EventStruct {
             for (rules in commandFunction.rules) {
                 val ruleResult = rules.execute(unifiedEvent)
                 if (ruleResult.type != RulesResultType.Passed) {
-                    it.reply_(
-                        embed = Embed {
-                            title = ":interrobang: ${ruleResult.type.title}"
-                            description = codeBlock(ruleResult.message ?: "No description provided.")
-                            color = QnortzColor.Red.int()
-                        }
-                    ).queue()
+                    it.replyEmbeds(Embed {
+                        title = ":interrobang: ${ruleResult.type.title}"
+                        description = codeBlock(ruleResult.message ?: "No description provided.")
+                        color = QnortzColor.Red.int()
+                    }).queue()
                     return@listener
                 }
             }
 
             when (commandFunction.type) {
-                TextCommand -> {
-                    commandFunction.textFunction!!.execute(it.toUnified())
-                }
-
-                SlashCommand -> {
-                    commandFunction.slashFunction!!.execute(it)
-                }
+                TextCommand -> commandFunction.textFunction!!.execute(unifiedEvent)
+                SlashCommand -> commandFunction.slashFunction!!.execute(it)
             }
         }
     }

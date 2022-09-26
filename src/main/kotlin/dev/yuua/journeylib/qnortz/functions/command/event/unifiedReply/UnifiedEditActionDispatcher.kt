@@ -2,12 +2,12 @@ package dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply
 
 import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
 import net.dv8tion.jda.api.entities.Message
-import net.dv8tion.jda.api.requests.restaction.MessageAction
-import net.dv8tion.jda.api.requests.restaction.WebhookMessageUpdateAction
+import net.dv8tion.jda.api.requests.restaction.MessageEditAction
+import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction
 
 data class UnifiedEditActionDispatcher(
-    val webhookMessageAction: WebhookMessageUpdateAction<Message>? = null,
-    val messageAction: MessageAction? = null
+    val webhookMessageAction: WebhookMessageEditAction<Message>? = null,
+    val messageAction: MessageEditAction? = null
 ) {
     private val illegalArgs = IllegalArgumentException("One of them must be null and the other must be not null!")
 

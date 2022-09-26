@@ -2,7 +2,6 @@ package dev.yuua.journeylib.qnortz.functions.command.router
 
 import dev.minn.jda.ktx.events.listener
 import dev.minn.jda.ktx.messages.Embed
-import dev.minn.jda.ktx.messages.reply_
 import dev.yuua.journeylib.qnortz.QnortzColor
 import dev.yuua.journeylib.qnortz.codeBlock
 import dev.yuua.journeylib.qnortz.functions.command.CommandManager
@@ -27,13 +26,11 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             val commandAnalysis = try {
                 analyzeTextCommand(";", message.contentRaw, manager.router)
             } catch (e: NoSuchElementException) {
-                message.reply_(
-                    embed = Embed {
-                        title = ":interrobang: Not Found"
-                        description = codeBlock("No such command was found!")
-                        color = QnortzColor.Red.int()
-                    }
-                ).queue()
+                message.replyEmbeds(Embed {
+                    title = ":interrobang: Not Found"
+                    description = codeBlock("No such command was found!")
+                    color = QnortzColor.Red.int()
+                }).queue()
                 return@listener
             } catch (_: IllegalArgumentException) {
                 // not starts with prefix
@@ -47,13 +44,11 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
 
             // check compatibility for text-command
             if (commandFunction.textFunction == null) {
-                message.reply_(
-                    embed = Embed {
-                        title = ":interrobang: Compatibility Error"
-                        description = codeBlock("This command is not compatible with text messages!")
-                        color = QnortzColor.Red.int()
-                    }
-                ).queue()
+                message.replyEmbeds(Embed {
+                    title = ":interrobang: Compatibility Error"
+                    description = codeBlock("This command is not compatible with text messages!")
+                    color = QnortzColor.Red.int()
+                }).queue()
                 return@listener
             }
 
@@ -63,19 +58,17 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             // cancel command execution if this channel cannot be accepted.
             val acceptedOn = commandFunction.acceptedOn
             if (acceptedOn.isNotEmpty() && !acceptedOn.contains(it.channelType)) {
-                message.reply_(embed = invalidChannelTypeEmbed(acceptedOn)).queue()
+                message.replyEmbeds(invalidChannelTypeEmbed(acceptedOn)).queue()
                 return@listener
             }
 
             // check options
             if (optionAnalysisResultMessage != null) {
-                message.reply_(
-                    embed = Embed {
-                        title = ":interrobang: Invalid Option!"
-                        description = codeBlock(optionAnalysisResultMessage)
-                        color = QnortzColor.Red.int()
-                    }
-                ).queue()
+                message.replyEmbeds(Embed {
+                    title = ":interrobang: Invalid Option!"
+                    description = codeBlock(optionAnalysisResultMessage)
+                    color = QnortzColor.Red.int()
+                }).queue()
                 return@listener
             }
 
@@ -87,9 +80,7 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             val limit = manager.limitRouter[commandFunction.packageName]
             val (passed, checkResultMessage) = limit.check(unifiedEvent, it.guild, it.channel, it.author, false)
             if (!passed) {
-                message.reply_(
-                    embed = accessForbiddenEmbed(checkResultMessage)
-                ).queue()
+                message.replyEmbeds(accessForbiddenEmbed(checkResultMessage)).queue()
                 return@listener
             }
 
@@ -97,13 +88,11 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             for (rules in commandFunction.rules) {
                 val ruleResult = rules.execute(unifiedEvent)
                 if (ruleResult.type != RulesResultType.Passed) {
-                    message.reply_(
-                        embed = Embed {
-                            title = ":interrobang: ${ruleResult.type.title}"
-                            description = codeBlock(ruleResult.message ?: "No description provided.")
-                            color = QnortzColor.Red.int()
-                        }
-                    ).queue()
+                    message.replyEmbeds(Embed {
+                        title = ":interrobang: ${ruleResult.type.title}"
+                        description = codeBlock(ruleResult.message ?: "No description provided.")
+                        color = QnortzColor.Red.int()
+                    }).queue()
                     return@listener
                 }
             }

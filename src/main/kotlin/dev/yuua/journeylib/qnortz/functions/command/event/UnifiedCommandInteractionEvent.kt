@@ -8,9 +8,13 @@ import dev.yuua.journeylib.qnortz.functions.command.builder.option.*
 import dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply.toUnifiedReplyActionDispatcher
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.*
+import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
+import net.dv8tion.jda.api.interactions.components.LayoutComponent
+import net.dv8tion.jda.api.utils.FileUpload
 
 /**
  * Command interaction event which supports both [SlashCommandInteractionEvent] and [MessageReceivedEvent].
@@ -45,25 +49,21 @@ data class UnifiedCommandInteractionEvent(
      * Reply to user. (for Kotlin)
      *
      * @param content The string message to send.
-     * @param embed The single embed to send.
      * @param embeds Multiple embeds to send.
-     * @param file The single file to send.
      * @param files Multiple files to reply.
      */
     fun reply(
-        content: String? = null,
-        embed: MessageEmbed? = null,
-        embeds: Embeds = emptyList(),
-        components: Components = emptyList(),
-        file: NamedFile? = null,
-        files: Files = emptyList()
+        content: String,
+        embeds: Collection<MessageEmbed> = emptyList(),
+        components: Collection<LayoutComponent> = emptyList(),
+        files: Collection<FileUpload> = emptyList()
     ) = when (jdaEvent.type) {
         CommandFromType.SlashCommand ->
-            slash!!.reply_(content, embed, embeds, components, file, files)
+            slash!!.reply_(content, embeds, components, files)
                 .toUnifiedReplyActionDispatcher()
 
         CommandFromType.TextCommand ->
-            text!!.message.reply_(content, embed, embeds, components, file, files)
+            text!!.message.reply_(content, embeds, components, files)
                 .toUnifiedReplyActionDispatcher()
     }
 
@@ -76,11 +76,11 @@ data class UnifiedCommandInteractionEvent(
     fun reply(embed: MessageEmbed, vararg embeds: MessageEmbed) =
         when (jdaEvent.type) {
             CommandFromType.SlashCommand ->
-                slash!!.reply_(embed = embed, embeds = embeds.toList())
+                slash!!.reply_(embeds = embeds.toList())
                     .toUnifiedReplyActionDispatcher()
 
             CommandFromType.TextCommand ->
-                text!!.message.reply_(embed = embed, embeds = embeds.toList())
+                text!!.message.reply_(embeds = embeds.toList())
                     .toUnifiedReplyActionDispatcher()
         }
 

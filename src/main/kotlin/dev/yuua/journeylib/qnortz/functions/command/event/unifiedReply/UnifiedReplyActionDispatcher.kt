@@ -1,17 +1,17 @@
 package dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply
 
 import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
-import net.dv8tion.jda.api.requests.restaction.MessageAction
+import net.dv8tion.jda.api.requests.restaction.MessageCreateAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
 
 data class UnifiedReplyActionDispatcher(
     val replyCallbackAction: ReplyCallbackAction? = null,
-    val messageAction: MessageAction? = null
+    val messageCreateAction: MessageCreateAction? = null
 ) {
     private val illegalArgs = IllegalArgumentException("One of them must be null and the other must be not null!")
 
     private val replyCallbackIsNull = replyCallbackAction == null
-    private val messageIsNull = messageAction == null
+    private val messageIsNull = messageCreateAction == null
 
     init {
         if ((!replyCallbackIsNull && !messageIsNull) || (replyCallbackIsNull && messageIsNull))
@@ -29,7 +29,7 @@ data class UnifiedReplyActionDispatcher(
             replyCallbackAction!!.queue({ success(it.toUnifiedEditAction()) }, { failure(it) })
 
         CommandFromType.TextCommand ->
-            messageAction!!.queue({ success(it.toUnifiedEditAction()) }, { failure(it) })
+            messageCreateAction!!.queue({ success(it.toUnifiedEditAction()) }, { failure(it) })
     }
 
     fun queue(success: ((UnifiedEditAction) -> Unit)) = when (type) {
@@ -37,7 +37,7 @@ data class UnifiedReplyActionDispatcher(
             replyCallbackAction!!.queue { success(it.toUnifiedEditAction()) }
 
         CommandFromType.TextCommand ->
-            messageAction!!.queue { success(it.toUnifiedEditAction()) }
+            messageCreateAction!!.queue { success(it.toUnifiedEditAction()) }
     }
 
     fun queue() = when (type) {
@@ -45,7 +45,7 @@ data class UnifiedReplyActionDispatcher(
             replyCallbackAction!!.queue()
 
         CommandFromType.TextCommand ->
-            messageAction!!.queue()
+            messageCreateAction!!.queue()
     }
 
     fun complete() = when (type) {
@@ -53,6 +53,6 @@ data class UnifiedReplyActionDispatcher(
             replyCallbackAction!!.complete().toUnifiedEditAction()
 
         CommandFromType.TextCommand ->
-            messageAction!!.complete().toUnifiedEditAction()
+            messageCreateAction!!.complete().toUnifiedEditAction()
     }
 }

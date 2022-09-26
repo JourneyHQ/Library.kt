@@ -5,12 +5,10 @@ import dev.yuua.journeylib.qnortz.rules.RulesResult
 import dev.yuua.journeylib.qnortz.rules.RulesResultType
 
 data class Limit<T>(
-    val guilds: List<String> = emptyList(),
-    val channels: List<String> = emptyList(),
-    val users: List<String> = emptyList(),
+    val guildIds: List<String> = emptyList(),
+    val channelIds: List<String> = emptyList(),
+    val userIds: List<String> = emptyList(),
     val rule: RulesFunction<T> = RulesFunction { RulesResult(type = RulesResultType.Passed) }
 ) {
-    fun isNotEmpty() = !(guilds.isEmpty() && users.isEmpty())
+    fun isNotEmpty() = !(guildIds.isEmpty() && userIds.isEmpty())
 }
-
-// todo support Discord's slash-command permissions (wait JDA & JDA-ktx)

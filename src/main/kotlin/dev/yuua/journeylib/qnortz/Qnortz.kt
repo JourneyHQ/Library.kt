@@ -11,7 +11,6 @@ import dev.yuua.journeylib.qnortz.functions.event.EventManager
 import dev.yuua.journeylib.qnortz.functions.event.EventStruct
 import dev.yuua.journeylib.qnortz.limit.Limit
 import dev.yuua.journeylib.qnortz.limit.LimitRouter
-import dev.yuua.journeylib.universal.LibFlow
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.GenericEvent
@@ -112,7 +111,7 @@ class Qnortz {
         }
         journal[Success](
             "Following guilds added as dev guild :",
-            devGuildList.joinToString("\n") { "${it.name}(${it.id})" }
+            *devGuildList.map { "${it.name}(${it.id})" }.toTypedArray()
         )
 
         QnortzInstances[name] = this

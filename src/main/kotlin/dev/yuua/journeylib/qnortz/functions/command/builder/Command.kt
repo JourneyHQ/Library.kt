@@ -2,6 +2,7 @@ package dev.yuua.journeylib.qnortz.functions.command.builder
 
 import dev.minn.jda.ktx.interactions.commands.Command
 import dev.minn.jda.ktx.interactions.commands.group
+import dev.minn.jda.ktx.interactions.commands.restrict
 import dev.minn.jda.ktx.interactions.commands.subcommand
 import dev.yuua.journeylib.qnortz.functions.command.CommandStructureType.*
 import dev.yuua.journeylib.qnortz.functions.command.builder.function.CommandFunction
@@ -12,11 +13,13 @@ import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteract
 import dev.yuua.journeylib.qnortz.functions.command.router.CommandRoute
 import dev.yuua.journeylib.qnortz.rules.RulesFunction
 import dev.yuua.journeylib.qnortz.rules.RulesResult
-import net.dv8tion.jda.api.entities.ChannelType
+import dev.yuua.journeylib.qnortz.rules.RulesResultType
+import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData
-import dev.yuua.journeylib.qnortz.rules.RulesResultType
 
 class Command {
     val name: String
@@ -212,6 +215,18 @@ class Command {
         return this
     }
 
+    var guildOnly = false
+    var permissions: DefaultMemberPermissions? = null
+
+    fun restrict(guildOnly: Boolean = false, permissions: DefaultMemberPermissions? = null): Command {
+        this.guildOnly = guildOnly
+        this.permissions = permissions
+        return this
+    }
+
+    fun restrict(guildOnly: Boolean = false, vararg permissions: Permission) =
+        restrict(guildOnly, DefaultMemberPermissions.enabledFor(*permissions))
+
     /**
      * Creates [CommandObject]
      */
@@ -246,12 +261,14 @@ class Command {
                     slashFunction, textFunction, jdaOptions, acceptedOn
                 )
                 command = Command(name, description) {
+                    this.restrict(guildOnly, permissions)
                     addOptions(jdaOptions)
                 }
             }
 
             SubcommandType -> {
-                command = Command(name, description) {
+                command = Command(name, description) SlashCommand@{
+                    this.restrict(guildOnly, permissions)
                     for (subcommand in this@Command.subcommands) {
                         subcommand(subcommand.name, subcommand.description) {
                             addOptions(subcommand.jdaOptions)
@@ -268,7 +285,8 @@ class Command {
             }
 
             SubcommandGroupType -> {
-                command = Command(name, description) {
+                command = Command(name, description) SlashCommand@{
+                    this.restrict(guildOnly, permissions)
                     for (subcommandGroup in this@Command.subcommandGroups) {
                         group(subcommandGroup.name, subcommandGroup.description) {
                             for (subcommand in subcommandGroup.subcommands) {

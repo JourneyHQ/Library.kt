@@ -7,7 +7,7 @@ import dev.yuua.journeylib.qnortz.functions.command.builder.function.TextFunctio
 import dev.yuua.journeylib.qnortz.functions.command.builder.option.OptionTool
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import dev.yuua.journeylib.qnortz.rules.RulesResultType
-import net.dv8tion.jda.api.entities.ChannelType
+import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
