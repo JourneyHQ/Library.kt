@@ -48,7 +48,7 @@ class Hello : CommandStruct {
 # Todo
 - [ ] Improve my poor English in the KDoc.
 - [ ] Java language support
-- [ ] Guild-only command (Nonnull Guild & Member)
+- [x] Guild-only command (Nonnull Guild & Member)
 - [ ] English & Japanese support
 - [ ] KDoc (<- Important)
 - [ ] Inline Autocomplete Function
