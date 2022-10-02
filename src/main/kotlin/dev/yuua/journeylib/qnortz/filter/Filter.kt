@@ -1,73 +1,57 @@
 package dev.yuua.journeylib.qnortz.filter
 
+import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
+import dev.yuua.journeylib.qnortz.functions.command.event.toUnified
+import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
-class Filter<T>(filter: Filter<T>.() -> Unit) {
-    init {
-        this.apply(filter)
-    }
+class Filter<T>(
+    val guildIds: List<String> = emptyList(),
+    val channelIds: List<String> = emptyList(),
+    val userIds: List<String> = emptyList(),
+    val roleIds: List<String> = emptyList(),
+    val permissions: List<Permission> = emptyList(),
+    val channelTypes: List<ChannelType> = emptyList(),
+    val guildOnly: Boolean = false,
+    val filter: T.() -> Boolean = { true }
+) {
+    private fun <T> check(list: List<T>, id: T?) = list.isEmpty() || list.contains(id)
 
-    private val guilds = mutableListOf<String>()
-    private val channels = mutableListOf<String>()
-    private val users = mutableListOf<String>()
-    private val roles = mutableListOf<String>()
-    private val channelTypes = mutableListOf<ChannelType>()
-    private var filterFunction: T.() -> Boolean = { true }
-
-    private fun check(list: List<String>, id: String) = list.isEmpty() || list.contains(id)
-
-    private fun checkGuild(guild: String) = check(guilds, guild)
-    private fun checkChannel(channel: String) = check(channels, channel)
-    private fun checkUser(user: String) = check(users, user)
-    private fun checkRole(role: String) = check(roles, role)
-    private fun checkChannelType(channelType: ChannelType) =
-        channelTypes.isEmpty() && channelTypes.contains(channelType)
-
-    fun guilds(vararg guildIdList: String) {//弾かれた場合のfunctionとか
-        guilds.addAll(guildIdList)
-        return
-    }
-
-    fun channels(vararg channelIdList: String) {
-        channels.addAll(channelIdList)
-        return
-    }
-
-    fun users(vararg userIdList: String) {
-        users.addAll(userIdList)
-        return
-    }
-
-    fun roles(vararg roleIdList: String) {
-        roles.addAll(roleIdList)
-        return
-    }
-
-    fun channelTypes(vararg channelTypeList: ChannelType) {
-        channelTypes.addAll(channelTypeList)
-        return
-    }
-
-    fun filterFunction(filterFunction: T.() -> Boolean) {
-        this.filterFunction = filterFunction
-    }
-
-    operator fun invoke(event: T) = checkEvent(event)
+    data class FilterElements(
+        val guildId: String?,
+        val channelId: String?,
+        val userId: String?,
+        val roleIds: List<String>,
+        val permissions: List<Permission>,
+        val channelType: ChannelType,
+        val isGuild: Boolean
+    )
 
     fun checkEvent(event: T): Boolean {
-        return when (event) {
-            is SlashCommandInteractionEvent -> listOf(
-                checkGuild(event.guild?.id ?: "%GUILD_NULL%"),
-                checkChannel(event.channel.id),
-                checkUser(event.user.id),
-                checkRole(event.member?.roles?.firstOrNull()?.id ?: "%ROLE_NULL%"),
-                checkChannelType(event.channelType)
-            ).all { it }
-
-            else -> {
-                false
-            }
+        val unifiedCommandEvent = when (event) {
+            is SlashCommandInteractionEvent -> event.toUnified()
+            is UnifiedCommandInteractionEvent -> event
+            else -> null
         }
+
+        val (guildId, channelId, userId, userRoleIds, userPermissions, channelType, isGuild) =
+            if (unifiedCommandEvent != null)
+                FilterElements(
+                    unifiedCommandEvent.guild?.id, unifiedCommandEvent.channel.id, unifiedCommandEvent.user.id,
+                    unifiedCommandEvent.member?.roles?.map { it.id } ?: emptyList(),
+                    unifiedCommandEvent.member?.permissions?.toList() ?: emptyList(),
+                    unifiedCommandEvent.channelType, unifiedCommandEvent.isFromGuild
+                )
+            else throw UnsupportedOperationException()
+
+        return listOf(
+            check(guildIds, guildId),
+            check(channelIds, channelId),
+            check(userIds, userId),
+            userRoleIds.map { roleIds.contains(it) }.any { it },
+            userPermissions.containsAll(permissions),
+            check(channelTypes, channelType),
+        ).all { it }
     }
 }
