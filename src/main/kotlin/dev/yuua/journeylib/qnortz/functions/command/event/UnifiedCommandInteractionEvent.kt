@@ -3,7 +3,7 @@ package dev.yuua.journeylib.qnortz.functions.command.event
 import dev.minn.jda.ktx.generics.getChannel
 import dev.minn.jda.ktx.interactions.commands.optionType
 import dev.minn.jda.ktx.messages.*
-import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
+import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType
 import dev.yuua.journeylib.qnortz.functions.command.builder.option.*
 import dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply.toUnifiedReplyActionDispatcher
 import net.dv8tion.jda.api.JDA
@@ -58,11 +58,11 @@ data class UnifiedCommandInteractionEvent(
         components: Collection<LayoutComponent> = emptyList(),
         files: Collection<FileUpload> = emptyList()
     ) = when (jdaEvent.type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             slash!!.reply_(content, embeds, components, files)
                 .toUnifiedReplyActionDispatcher()
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             text!!.message.reply_(content, embeds, components, files)
                 .toUnifiedReplyActionDispatcher()
     }
@@ -75,11 +75,11 @@ data class UnifiedCommandInteractionEvent(
      */
     fun reply(embed: MessageEmbed, vararg embeds: MessageEmbed) =
         when (jdaEvent.type) {
-            CommandFromType.SlashCommand ->
+            CommandMethodType.SlashCommand ->
                 slash!!.reply_(embeds = embeds.toList())
                     .toUnifiedReplyActionDispatcher()
 
-            CommandFromType.TextCommand ->
+            CommandMethodType.TextCommand ->
                 text!!.message.reply_(embeds = embeds.toList())
                     .toUnifiedReplyActionDispatcher()
         }
@@ -91,10 +91,10 @@ data class UnifiedCommandInteractionEvent(
      */
     fun reply(content: String) =
         when (jdaEvent.type) {
-            CommandFromType.SlashCommand ->
+            CommandMethodType.SlashCommand ->
                 slash!!.reply_(content).toUnifiedReplyActionDispatcher()
 
-            CommandFromType.TextCommand ->
+            CommandMethodType.TextCommand ->
                 text!!.message.reply_(content).toUnifiedReplyActionDispatcher()
         }
 

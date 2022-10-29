@@ -52,16 +52,6 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
                 return@listener
             }
 
-            // todo guild only function
-            // todo ↑ filter? (bool)
-
-            // cancel command execution if this channel cannot be accepted.
-            val acceptedOn = commandFunction.acceptedOn
-            if (acceptedOn.isNotEmpty() && !acceptedOn.contains(it.channelType)) {
-                message.replyEmbeds(invalidChannelTypeEmbed(acceptedOn)).queue()
-                return@listener
-            }
-
             // check options
             if (optionAnalysisResultMessage != null) {
                 message.replyEmbeds(Embed {
@@ -74,8 +64,6 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
 
             val unifiedEvent = it.toUnified(options)
 
-            // todo option to hide restriction reasons (configure in Qnortz)
-
             // limit : access control per package
             val limit = manager.limitRouter[commandFunction.packageName]
             val (passed, checkResultMessage) = limit.check(unifiedEvent, it.guild, it.channel, it.author, false)
@@ -84,18 +72,12 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
                 return@listener
             }
 
-            // rule : access control per command
-            for (rules in commandFunction.rules) {
-                val ruleResult = rules.execute(unifiedEvent)
-                if (ruleResult.type != RulesResultType.Passed) {
-                    message.replyEmbeds(Embed {
-                        title = ":interrobang: ${ruleResult.type.title}"
-                        description = codeBlock(ruleResult.message ?: "No description provided.")
-                        color = QnortzColor.Red.int()
-                    }).queue()
-                    return@listener
-                }
+            if (!commandFunction.filterEvent(unifiedEvent)) {
+                unifiedEvent.reply(accessForbiddenEmbed()).queue()
+                return@listener
             }
+
+            // todo option to hide restriction reasons (configure in Qnortz)
 
             commandFunction.textFunction.execute(unifiedEvent)
         }

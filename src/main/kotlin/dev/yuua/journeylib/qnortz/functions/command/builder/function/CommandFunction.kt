@@ -1,44 +1,58 @@
 package dev.yuua.journeylib.qnortz.functions.command.builder.function
 
-import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
+import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType
+import dev.yuua.journeylib.qnortz.functions.command.builder.UnifiedCommandFilter
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
-import dev.yuua.journeylib.qnortz.rules.RulesFunction
-import dev.yuua.journeylib.qnortz.rules.RulesResultType.Passed
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
 /**
- * Data class which holds data of the commands' instance.
+ * Data class which holds data of the instance of the command.
  *
- * @param slashFunction [SlashFunction] to execute. Cannot hold with [textFunction].
- * @param textFunction [TextFunction] to execute. Cannot hold with [slashFunction].
+ * @param slashFunction [SlashFunction] to execute.
+ * @param textFunction [TextFunction] to execute.
  * @param options List of [OptionData].
- * @param rules List of [RulesFunction]. All results must be [Passed] to execute the command.
- * @param acceptedOn List of [ChannelType] on which this command can be executed.
+ * @param filters [UnifiedCommandFilter] to allow or deny command execution.
+ *
+ * @throws IllegalArgumentException When both [slashFunction] and [textFunction] are provided at the same time.
  */
 data class CommandFunction(
     val slashFunction: SlashFunction?,
     val textFunction: TextFunction?,
     val options: List<OptionData>,
-    val rules: List<RulesFunction<UnifiedCommandInteractionEvent>>,
-    val acceptedOn: List<ChannelType>
+    val filters: List<UnifiedCommandFilter> //refactor
 ) {
     private val illegalArgs = IllegalArgumentException("One of them must be null and the other must be not null!")
+
+    private val slashIsNull = slashFunction == null
+    private val textIsNull = textFunction == null
 
     val packageName: String
 
     val type = when {
-        slashFunction != null -> CommandFromType.SlashCommand
-        textFunction != null -> CommandFromType.TextCommand
+        !slashIsNull -> CommandMethodType.SlashCommand
+        !textIsNull -> CommandMethodType.TextCommand
         else -> throw illegalArgs
     }
 
     init {
-        if ((slashFunction != null && textFunction != null) || (slashFunction == null && textFunction == null))
+        if (!(slashIsNull xor textIsNull))
             throw illegalArgs
         packageName = when (type) {
-            CommandFromType.TextCommand -> textFunction!!::class.java.packageName
-            CommandFromType.SlashCommand -> slashFunction!!::class.java.packageName
+            CommandMethodType.TextCommand -> textFunction!!::class.java.packageName
+            CommandMethodType.SlashCommand -> slashFunction!!::class.java.packageName
         }
+    }
+
+    fun checkChannelType(channelType: ChannelType): Pair<Boolean, MutableList<ChannelType>> {
+        val acceptedOn = mutableListOf<ChannelType>()
+        filters.map { filter -> filter.channelTypes }
+            .forEach { channelTypes -> acceptedOn.addAll(channelTypes) }
+
+        return !(acceptedOn.isNotEmpty() && acceptedOn.contains(channelType)) to acceptedOn
+    }
+
+    fun filterEvent(event: UnifiedCommandInteractionEvent): Boolean {
+        return filters.map { it.checkEvent(event) }.all { it }
     }
 }

@@ -17,7 +17,7 @@ fun invalidChannelTypeEmbed(acceptedOn: List<ChannelType>) =
         color = QnortzColor.Red.int()
     }
 
-fun accessForbiddenEmbed(message: String?) = Embed {
+fun accessForbiddenEmbed(message: String? = null) = Embed {
     title = ":interrobang: Access Forbidden!"
     description = codeBlock(message ?: "You do not have access to this command.")
     color = QnortzColor.Red.int()

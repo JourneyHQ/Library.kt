@@ -1,6 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply
 
-import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
+import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType
 import net.dv8tion.jda.api.requests.restaction.MessageCreateAction
 import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction
 
@@ -19,40 +19,40 @@ data class UnifiedReplyActionDispatcher(
     }
 
     val type = when {
-        !replyCallbackIsNull -> CommandFromType.SlashCommand
-        !messageIsNull -> CommandFromType.TextCommand
+        !replyCallbackIsNull -> CommandMethodType.SlashCommand
+        !messageIsNull -> CommandMethodType.TextCommand
         else -> throw illegalArgs // never happen
     }
 
     fun queue(success: ((UnifiedEditAction) -> Unit), failure: ((Throwable) -> Unit)) = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             replyCallbackAction!!.queue({ success(it.toUnifiedEditAction()) }, { failure(it) })
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageCreateAction!!.queue({ success(it.toUnifiedEditAction()) }, { failure(it) })
     }
 
     fun queue(success: ((UnifiedEditAction) -> Unit)) = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             replyCallbackAction!!.queue { success(it.toUnifiedEditAction()) }
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageCreateAction!!.queue { success(it.toUnifiedEditAction()) }
     }
 
     fun queue() = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             replyCallbackAction!!.queue()
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageCreateAction!!.queue()
     }
 
     fun complete() = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             replyCallbackAction!!.complete().toUnifiedEditAction()
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageCreateAction!!.complete().toUnifiedEditAction()
     }
 }

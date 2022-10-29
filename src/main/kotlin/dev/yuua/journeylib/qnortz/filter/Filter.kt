@@ -3,8 +3,10 @@ package dev.yuua.journeylib.qnortz.filter
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import dev.yuua.journeylib.qnortz.functions.command.event.toUnified
 import net.dv8tion.jda.api.Permission
+import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
+import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 
 class Filter<T>(
     val guildIds: List<String> = emptyList(),
@@ -14,9 +16,11 @@ class Filter<T>(
     val permissions: List<Permission> = emptyList(),
     val channelTypes: List<ChannelType> = emptyList(),
     val guildOnly: Boolean = false,
-    val filter: T.() -> Boolean = { true }
+    val filterScript: T.() -> Boolean = { true }
 ) {
-    private fun <T> check(list: List<T>, id: T?) = list.isEmpty() || list.contains(id)
+    val defaultMemberPermissions = DefaultMemberPermissions.enabledFor(permissions)
+
+    private fun <T> containOrEmpty(list: List<T>, id: T?) = list.isEmpty() || list.contains(id)
 
     data class FilterElements(
         val guildId: String?,
@@ -28,9 +32,9 @@ class Filter<T>(
         val isGuild: Boolean
     )
 
+    // todo support more event types
     fun checkEvent(event: T): Boolean {
         val unifiedCommandEvent = when (event) {
-            is SlashCommandInteractionEvent -> event.toUnified()
             is UnifiedCommandInteractionEvent -> event
             else -> null
         }
@@ -46,12 +50,14 @@ class Filter<T>(
             else throw UnsupportedOperationException()
 
         return listOf(
-            check(guildIds, guildId),
-            check(channelIds, channelId),
-            check(userIds, userId),
+            containOrEmpty(guildIds, guildId),
+            containOrEmpty(channelIds, channelId),
+            containOrEmpty(userIds, userId),
             userRoleIds.map { roleIds.contains(it) }.any { it },
             userPermissions.containsAll(permissions),
-            check(channelTypes, channelType),
+            containOrEmpty(channelTypes, channelType),
+            !(guildOnly && !isGuild),
+            filterScript(event)
         ).all { it }
     }
 }

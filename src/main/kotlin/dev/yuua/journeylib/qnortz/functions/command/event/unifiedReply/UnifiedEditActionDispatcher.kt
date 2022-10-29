@@ -1,6 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply
 
-import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
+import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.requests.restaction.MessageEditAction
 import net.dv8tion.jda.api.requests.restaction.WebhookMessageEditAction
@@ -20,40 +20,40 @@ data class UnifiedEditActionDispatcher(
     }
 
     val type = when {
-        !webhookMessageIsNull -> CommandFromType.SlashCommand
-        !messageIsNull -> CommandFromType.TextCommand
+        !webhookMessageIsNull -> CommandMethodType.SlashCommand
+        !messageIsNull -> CommandMethodType.TextCommand
         else -> throw illegalArgs // never happen
     }
 
     fun queue(success: ((Message) -> Unit), failure: ((Throwable) -> Unit)) = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             webhookMessageAction!!.queue({ success(it) }, { failure(it) })
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageAction!!.queue({ success(it) }, { failure(it) })
     }
 
     fun queue(success: ((Message) -> Unit)) = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             webhookMessageAction!!.queue { success(it) }
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageAction!!.queue { success(it) }
     }
 
     fun queue() = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             webhookMessageAction!!.queue()
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageAction!!.queue()
     }
 
     fun complete(): Message = when (type) {
-        CommandFromType.SlashCommand ->
+        CommandMethodType.SlashCommand ->
             webhookMessageAction!!.complete()
 
-        CommandFromType.TextCommand ->
+        CommandMethodType.TextCommand ->
             messageAction!!.complete()
     }
 }

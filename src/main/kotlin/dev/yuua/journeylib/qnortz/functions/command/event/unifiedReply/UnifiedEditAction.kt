@@ -2,7 +2,7 @@ package dev.yuua.journeylib.qnortz.functions.command.event.unifiedReply
 
 import dev.minn.jda.ktx.messages.edit
 import dev.minn.jda.ktx.messages.editMessage
-import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
+import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType
 import net.dv8tion.jda.api.entities.Message
 import net.dv8tion.jda.api.entities.MessageEmbed
 import net.dv8tion.jda.api.interactions.InteractionHook
@@ -24,8 +24,8 @@ data class UnifiedEditAction(
     }
 
     val type = when {
-        !interactionIsNull -> CommandFromType.SlashCommand
-        !messageIsNull -> CommandFromType.TextCommand
+        !interactionIsNull -> CommandMethodType.SlashCommand
+        !messageIsNull -> CommandMethodType.TextCommand
         else -> throw illegalArgs // never happen
     }
 
@@ -36,13 +36,13 @@ data class UnifiedEditAction(
         files: Collection<FileUpload> = emptyList(),
         replace: Boolean = false
     ) = when (type) {
-        CommandFromType.SlashCommand -> {
+        CommandMethodType.SlashCommand -> {
             val webhookMessageUpdateAction =
                 interaction!!.editMessage("@original", content, embeds, components, files, replace)
             webhookMessageUpdateAction.toUnifiedEditActionDispatcher()
         }
 
-        CommandFromType.TextCommand -> {
+        CommandMethodType.TextCommand -> {
             val messageAction = message!!.edit(content, embeds, components, files, replace)
             messageAction.toUnifiedEditActionDispatcher()
         }

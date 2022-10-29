@@ -1,6 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command.event
 
-import dev.yuua.journeylib.qnortz.functions.command.CommandFromType
+import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
@@ -21,14 +21,14 @@ data class CommandInteraction(
     private val slashIsNull = slashCommandInteractionEvent == null
     private val textIsNull = messageReceivedEvent == null
 
-    init {
-        if ((!slashIsNull && !textIsNull) || (slashIsNull && textIsNull))
-            throw illegalArgs
+    val type = when {
+        !slashIsNull -> CommandMethodType.SlashCommand
+        !textIsNull -> CommandMethodType.TextCommand
+        else -> throw illegalArgs // never happen
     }
 
-    val type = when {
-        !slashIsNull -> CommandFromType.SlashCommand
-        !textIsNull -> CommandFromType.TextCommand
-        else -> throw illegalArgs // never happen
+    init {
+        if (!(slashIsNull xor textIsNull))
+            throw illegalArgs
     }
 }

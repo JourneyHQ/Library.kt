@@ -10,6 +10,6 @@ enum class CommandStructureType {
 /**
  * Types of command.
  */
-enum class CommandFromType {
+enum class CommandMethodType {
     TextCommand, SlashCommand
 }
