@@ -1,7 +1,7 @@
 package dev.yuua.journeylib.qnortz.functions
 
 import dev.yuua.journeylib.qnortz.Qnortz
-import dev.yuua.journeylib.qnortz.limit.LimitRouter
+import dev.yuua.journeylib.qnortz.filter.PackageFilter
 import org.reflections.Reflections
 import java.lang.reflect.Constructor
 
@@ -9,7 +9,7 @@ interface ManagerStruct<T : FunctionStruct, E> {
     val qnortz: Qnortz
     val name: String
     val functionPackage: String
-    val limitRouter: LimitRouter<E>
+    val packageFilter: PackageFilter<E>
 
     val instances: MutableList<T>
 

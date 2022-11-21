@@ -3,6 +3,7 @@ package dev.yuua.journeylib.qnortz.functions.command
 import dev.minn.jda.ktx.interactions.commands.updateCommands
 import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.Qnortz
+import dev.yuua.journeylib.qnortz.filter.PackageFilter
 import dev.yuua.journeylib.qnortz.functions.FunctionRouter
 import dev.yuua.journeylib.qnortz.functions.ManagerStruct
 import dev.yuua.journeylib.qnortz.functions.command.builder.CommandObject
@@ -27,7 +28,7 @@ typealias TaskCoroutine = CoroutineScope.() -> Unit
 class CommandManager(
     override val qnortz: Qnortz,
     override val functionPackage: String,
-    override val limitRouter: LimitRouter<UnifiedCommandInteractionEvent>
+    override val packageFilter: PackageFilter<UnifiedCommandInteractionEvent>
 ) : ManagerStruct<CommandStruct, UnifiedCommandInteractionEvent> {
 
     override val name = "Command"

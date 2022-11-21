@@ -39,10 +39,8 @@ class Qnortz {
         this.apply(script)
         fun required(name: String) = IllegalArgumentException("$name is required.")
 
-        if (!::name.isInitialized)
-            throw required("Name")
-        if (!::token.isInitialized)
-            throw required("Token")
+        if (!::name.isInitialized) throw required("Name")
+        if (!::token.isInitialized) throw required("Token")
 
         journal = Journal(name)
 
