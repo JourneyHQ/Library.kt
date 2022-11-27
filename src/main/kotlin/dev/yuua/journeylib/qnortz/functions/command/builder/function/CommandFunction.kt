@@ -52,7 +52,7 @@ data class CommandFunction(
         return !(acceptedOn.isNotEmpty() && acceptedOn.contains(channelType)) to acceptedOn
     }
 
-    fun filterEvent(event: UnifiedCommandInteractionEvent): Boolean {
+    fun checkFilter(event: UnifiedCommandInteractionEvent): Boolean {
         return filters.map { it.checkEvent(event) }.all { it }
     }
 }

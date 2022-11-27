@@ -8,7 +8,6 @@ import dev.yuua.journeylib.qnortz.functions.command.CommandManager
 import dev.yuua.journeylib.qnortz.functions.command.event.toUnified
 import dev.yuua.journeylib.qnortz.functions.event.EventStruct
 import dev.yuua.journeylib.qnortz.limit.check
-import dev.yuua.journeylib.qnortz.rules.RulesResultType
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
@@ -72,7 +71,7 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
                 return@listener
             }
 
-            if (!commandFunction.filterEvent(unifiedEvent)) {
+            if (!commandFunction.checkFilter(unifiedEvent)) {
                 unifiedEvent.reply(accessForbiddenEmbed()).queue()
                 return@listener
             }

@@ -1,6 +1,6 @@
 package dev.yuua.journeylib.qnortz.filter
 
-class PackageFilterRouter<T>(packageFilter: PackageFilter<T>) {
+class PackageFilterRouter<T>(private val rootPackage: String, packageFilter: PackageFilter<T>) {
     private val filterPaths = hashMapOf<String?, Filter<T>>()
 
     private fun expandPackageFilter(prvPath: String? = null, packageFilter: PackageFilter<T>) {
@@ -18,11 +18,13 @@ class PackageFilterRouter<T>(packageFilter: PackageFilter<T>) {
 
     /**
      * Collect all [Filter]s matching the specified [path].
-     * @param path The path to the package.
+     * @param path The **FULL** path to the package.
      * @return [Filter]s
      */
     fun findAll(path: String): List<Filter<T>> {
-        val splitPath = path.split(".")
+        val rootPackageSkip = rootPackage.split(".").size
+        val splitFullPath = path.split(".")
+        val splitPath = splitFullPath.subList(rootPackageSkip, splitFullPath.size)
         val filters = mutableListOf<Filter<T>>()
 
         repeat(splitPath.size) {

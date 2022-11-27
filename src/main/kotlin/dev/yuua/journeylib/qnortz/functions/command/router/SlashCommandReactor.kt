@@ -1,12 +1,11 @@
 package dev.yuua.journeylib.qnortz.functions.command.router
 
 import dev.minn.jda.ktx.events.listener
+import dev.yuua.journeylib.qnortz.functions.command.CommandManager
 import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType.SlashCommand
 import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType.TextCommand
-import dev.yuua.journeylib.qnortz.functions.command.CommandManager
 import dev.yuua.journeylib.qnortz.functions.command.event.toUnified
 import dev.yuua.journeylib.qnortz.functions.event.EventStruct
-import dev.yuua.journeylib.qnortz.limit.check
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 
@@ -17,35 +16,32 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
  */
 class SlashCommandReactor(private val manager: CommandManager) : EventStruct {
     override val script: JDA.() -> Unit = {
-        listener<SlashCommandInteractionEvent> {
+        listener<SlashCommandInteractionEvent> { event ->
             val commandFunction = manager.router[CommandRoute(
-                it.name,
-                it.subcommandGroup,
-                it.subcommandName
+                event.name,
+                event.subcommandGroup,
+                event.subcommandName
             )]
 
-            val unifiedEvent = it.toUnified()
+            val unifiedEvent = event.toUnified()
 
             // todo Duplicated code fragment
 
-            // limit : access control per package
-            val limit = manager.limitRouter[commandFunction.packageName]
-            val (passed, checkResultMessage) =
-                limit.check(unifiedEvent, it.guild, it.channel, it.user, false)
+            val filters = manager.packageFilterRouter.findAll(commandFunction.packageName)
+            val passed = filters.all { it.checkEvent(unifiedEvent) }
             if (!passed) {
                 it.replyEmbeds(accessForbiddenEmbed(checkResultMessage)).setEphemeral(true).queue()
                 return@listener
             }
 
-            // rule : access control per command
-            if (!commandFunction.filterEvent(unifiedEvent)) {
-                it.replyEmbeds(accessForbiddenEmbed()).setEphemeral(true).queue()
+            if (!commandFunction.checkFilter(unifiedEvent)) {
+                event.replyEmbeds(accessForbiddenEmbed()).setEphemeral(true).queue()
                 return@listener
             }
 
             when (commandFunction.type) {
                 TextCommand -> commandFunction.textFunction!!.execute(unifiedEvent)
-                SlashCommand -> commandFunction.slashFunction!!.execute(it)
+                SlashCommand -> commandFunction.slashFunction!!.execute(event)
             }
         }
     }

@@ -3,7 +3,7 @@ package dev.yuua.journeylib.qnortz.functions.command
 import dev.minn.jda.ktx.interactions.commands.updateCommands
 import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.Qnortz
-import dev.yuua.journeylib.qnortz.filter.PackageFilter
+import dev.yuua.journeylib.qnortz.filter.PackageFilterRouter
 import dev.yuua.journeylib.qnortz.functions.FunctionRouter
 import dev.yuua.journeylib.qnortz.functions.ManagerStruct
 import dev.yuua.journeylib.qnortz.functions.command.builder.CommandObject
@@ -11,7 +11,6 @@ import dev.yuua.journeylib.qnortz.functions.command.builder.function.CommandFunc
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import dev.yuua.journeylib.qnortz.functions.command.router.CommandRoute
 import dev.yuua.journeylib.qnortz.functions.functionClasses
-import dev.yuua.journeylib.qnortz.limit.LimitRouter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -23,12 +22,12 @@ typealias TaskCoroutine = CoroutineScope.() -> Unit
  *
  * @param qnortz Qnortz instance.
  * @param functionPackage The package on which command classes placed.
- * @param limitRouter [LimitRouter] for per-package limitation.
+ * @param packageFilterRouter [PackageFilterRouter] for per-package limitation.
  */
 class CommandManager(
     override val qnortz: Qnortz,
     override val functionPackage: String,
-    override val packageFilter: PackageFilter<UnifiedCommandInteractionEvent>
+    override val packageFilterRouter: PackageFilterRouter<UnifiedCommandInteractionEvent>
 ) : ManagerStruct<CommandStruct, UnifiedCommandInteractionEvent> {
 
     override val name = "Command"
@@ -52,15 +51,24 @@ class CommandManager(
             guildCommands[it.id] = mutableListOf()
         }
 
-        instances.forEach {
-            val packageName = it::class.java.packageName
-            val limit = limitRouter[packageName]
-            val commandObject = it.command
+        instances.forEach { instance ->
+            val packageName = instance::class.java.packageName
+            val filters = packageFilterRouter.findAll(packageName)
+            val commandObject = instance.command
 
-            if (limit.guildIds.isEmpty()) {
+            if (filters.all { it.guildIds.isEmpty() }) {
                 publicCommands.add(commandObject)
             } else {
-                for (guildId in limit.guildIds)
+                val guildIdLists = filters.map { it.guildIds }.filter { it.isNotEmpty() }
+                val allGuildIds = guildIdLists.flatten().distinct()
+
+                var commonGuildIds = guildIdLists.first().toSet()
+                for ((index, guildIds) in guildIdLists.withIndex()) {
+                    if (index == 0) continue
+                    commonGuildIds = commonGuildIds.intersect(guildIds.toSet())
+                }
+
+                for (guildId in commonGuildIds)
                     guildCommands[guildId]!!.add(commandObject) // !! -> already initialized
             }
         }

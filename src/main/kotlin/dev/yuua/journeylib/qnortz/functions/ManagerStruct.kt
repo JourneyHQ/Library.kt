@@ -2,6 +2,7 @@ package dev.yuua.journeylib.qnortz.functions
 
 import dev.yuua.journeylib.qnortz.Qnortz
 import dev.yuua.journeylib.qnortz.filter.PackageFilter
+import dev.yuua.journeylib.qnortz.filter.PackageFilterRouter
 import org.reflections.Reflections
 import java.lang.reflect.Constructor
 
@@ -9,7 +10,7 @@ interface ManagerStruct<T : FunctionStruct, E> {
     val qnortz: Qnortz
     val name: String
     val functionPackage: String
-    val packageFilter: PackageFilter<E>
+    val packageFilterRouter: PackageFilterRouter<E>
 
     val instances: MutableList<T>
 
