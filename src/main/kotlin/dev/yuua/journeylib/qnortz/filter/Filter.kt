@@ -1,13 +1,11 @@
 package dev.yuua.journeylib.qnortz.filter
 
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
-import dev.yuua.journeylib.qnortz.functions.command.event.toUnified
 import net.dv8tion.jda.api.Permission
-import net.dv8tion.jda.api.entities.Role
 import net.dv8tion.jda.api.entities.channel.ChannelType
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 
+// todo rejection reasons
 class Filter<T>(
     val guildIds: List<String> = emptyList(),
     val channelIds: List<String> = emptyList(),
@@ -16,7 +14,7 @@ class Filter<T>(
     val permissions: List<Permission> = emptyList(),
     val channelTypes: List<ChannelType> = emptyList(),
     val guildOnly: Boolean = false,
-    val filterScript: T.() -> Boolean = { true }
+    val filterScript: T.() -> Pair<Boolean,String> = { true to "" }
 ) {
     val defaultMemberPermissions = DefaultMemberPermissions.enabledFor(permissions)
 
@@ -49,15 +47,18 @@ class Filter<T>(
                 )
             else throw UnsupportedOperationException()
 
-        return listOf(
-            containOrEmpty(guildIds, guildId),
-            containOrEmpty(channelIds, channelId),
-            containOrEmpty(userIds, userId),
-            userRoleIds.map { roleIds.contains(it) }.any { it },
-            userPermissions.containsAll(permissions),
-            containOrEmpty(channelTypes, channelType),
-            !(guildOnly && !isGuild),
+        fun notAvailableOnThis(string: String) = "Not available on this $string."
+        val youDontHavePermissions = "You don't have permissions."
+
+        return hashMapOf(
+            containOrEmpty(guildIds, guildId) to notAvailableOnThis("guild"),
+            containOrEmpty(channelIds, channelId) to notAvailableOnThis("channel"),
+            containOrEmpty(userIds, userId) to youDontHavePermissions,
+            (roleIds.isEmpty() || userRoleIds.any { roleIds.contains(it) }) to youDontHavePermissions,
+            (permissions.isEmpty() || userPermissions.containsAll(permissions)) to youDontHavePermissions,
+            containOrEmpty(channelTypes, channelType) to "${notAvailableOnThis("type of channel")} Available on `${channelTypes.joinToString(", ")}`",
+            !(guildOnly && !isGuild) to "Only available on guilds.",
             filterScript(event)
-        ).all { it }
+        ).all { it } // todo
     }
 }

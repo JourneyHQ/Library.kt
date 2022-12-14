@@ -7,6 +7,7 @@
       <w>selectmenu</w>
       <w>subcmd</w>
       <w>subcmds</w>
+      <w>subcommandgroup</w>
     </words>
   </dictionary>
 </component>

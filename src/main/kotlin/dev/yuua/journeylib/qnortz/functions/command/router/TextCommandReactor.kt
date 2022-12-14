@@ -7,7 +7,6 @@ import dev.yuua.journeylib.qnortz.codeBlock
 import dev.yuua.journeylib.qnortz.functions.command.CommandManager
 import dev.yuua.journeylib.qnortz.functions.command.event.toUnified
 import dev.yuua.journeylib.qnortz.functions.event.EventStruct
-import dev.yuua.journeylib.qnortz.limit.check
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 
@@ -18,13 +17,14 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
  */
 class TextCommandReactor(private val manager: CommandManager) : EventStruct {
     override val script: JDA.() -> Unit = {
-        listener<MessageReceivedEvent> {
-            val message = it.message
+        listener<MessageReceivedEvent> { event ->
+            val message = event.message
 
             // analyze command string
             val commandAnalysis = try {
                 analyzeTextCommand(";", message.contentRaw, manager.router)
             } catch (e: NoSuchElementException) {
+                // command not found
                 message.replyEmbeds(Embed {
                     title = ":interrobang: Not Found"
                     description = codeBlock("No such command was found!")
@@ -61,23 +61,19 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
                 return@listener
             }
 
-            val unifiedEvent = it.toUnified(options)
+            val unifiedEvent = event.toUnified(options)
 
-            // limit : access control per package
-            val limit = manager.limitRouter[commandFunction.packageName]
-            val (passed, checkResultMessage) = limit.check(unifiedEvent, it.guild, it.channel, it.author, false)
-            if (!passed) {
-                message.replyEmbeds(accessForbiddenEmbed(checkResultMessage)).queue()
-                return@listener
-            }
+            // check filter
+            val filters = manager.packageFilterRouter.findAll(commandFunction.packageName)
+            val packageAllowed = filters.all { it.checkEvent(unifiedEvent) }
+            val commandAllowed = commandFunction.checkFilter(unifiedEvent)
 
-            if (!commandFunction.checkFilter(unifiedEvent)) {
-                unifiedEvent.reply(accessForbiddenEmbed()).queue()
+            if (packageAllowed && commandAllowed) {
+                message.replyEmbeds(accessForbiddenEmbed()).queue()
                 return@listener
             }
 
             // todo option to hide restriction reasons (configure in Qnortz)
-
             commandFunction.textFunction.execute(unifiedEvent)
         }
     }

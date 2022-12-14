@@ -3,77 +3,55 @@ package dev.yuua.journeylib.qnortz
 import dev.minn.jda.ktx.jdabuilder.default
 import dev.yuua.journeylib.journal.Journal
 import dev.yuua.journeylib.journal.Journal.Symbols.*
+import dev.yuua.journeylib.qnortz.filter.PackageFilter
+import dev.yuua.journeylib.qnortz.filter.PackageFilterRouter
 import dev.yuua.journeylib.qnortz.functions.command.CommandManager
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import dev.yuua.journeylib.qnortz.functions.command.router.SlashCommandReactor
 import dev.yuua.journeylib.qnortz.functions.command.router.TextCommandReactor
 import dev.yuua.journeylib.qnortz.functions.event.EventManager
-import dev.yuua.journeylib.qnortz.functions.event.EventStruct
-import dev.yuua.journeylib.qnortz.limit.Limit
-import dev.yuua.journeylib.qnortz.limit.LimitRouter
 import net.dv8tion.jda.api.JDA
+import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
-import net.dv8tion.jda.api.utils.MemberCachePolicy
-import net.dv8tion.jda.api.utils.cache.CacheFlag
 
-class Qnortz {
+/**
+ * @param name The name of the Qnortz instance.
+ * @param token The token for Discord bot.
+ * @param intents Discord [GatewayIntent]s to enable.
+ */
+class Qnortz(
+    val name: String,
+    val token: String,
+    vararg intents: GatewayIntent,
+    qnortzBuilder: Qnortz.() -> Unit
+) {
     val journal: Journal
 
     lateinit var jda: JDA
-    lateinit var name: String
-    lateinit var token: String
-    val intents = mutableListOf<GatewayIntent>()
-
-    constructor(name: String, token: String, vararg intents: GatewayIntent) {
-        this.name = name
-        this.token = token
-        this.intents.addAll(intents)
-        journal = Journal(name)
-
-        journal[Info]("Initializing $name...")
-    }
-
-    constructor(script: Qnortz.() -> Unit) {
-        this.apply(script)
-        fun required(name: String) = IllegalArgumentException("$name is required.")
-
-        if (!::name.isInitialized) throw required("Name")
-        if (!::token.isInitialized) throw required("Token")
-
-        journal = Journal(name)
-
-        journal[Info]("Initializing $name...")
-    }
-
-    fun intents(vararg intents: GatewayIntent) {
-        this.intents.addAll(intents)
-    }
+    private val intents = mutableListOf(*intents)
 
     // Function Managers
     private lateinit var commandManager: CommandManager
-    fun initCommands(
+    fun enableCommands(
         functionPackage: String,
-        vararg limits: Pair<String, Limit<UnifiedCommandInteractionEvent>>
+        packageFilter: PackageFilter<UnifiedCommandInteractionEvent> = PackageFilter()
     ): CommandManager {
-        commandManager = CommandManager(this, functionPackage, LimitRouter(functionPackage, limits.asList()))
+        commandManager = CommandManager(this, functionPackage, PackageFilterRouter(functionPackage, packageFilter))
         return commandManager
     }
 
     private lateinit var eventManager: EventManager
-    fun initEvents(
+    fun enableEvents(
         functionPackage: String,
-        vararg limits: Pair<String, Limit<GenericEvent>>,
+        packageFilter: PackageFilter<GenericEvent> = PackageFilter()
     ): EventManager {
-        eventManager = EventManager(this, functionPackage, LimitRouter(functionPackage, limits.asList()))
+        eventManager = EventManager(this, functionPackage, PackageFilterRouter(functionPackage, packageFilter))
         return eventManager
     }
 
-    fun EventManager.addEvents(vararg events: EventStruct) {
-        this.add(*events)
-    }
-
+    // Development Environment
     var isDevEnv = false
     lateinit var devPrefix: String
     private val devGuildIdList = mutableListOf<String>()
@@ -85,34 +63,37 @@ class Qnortz {
         this.devGuildIdList.addAll(devGuildIdList)
     }
 
-    fun build() {
-        build { }
-    }
+    // Builders
+    fun build(jdaBuilder: JDABuilder.() -> Unit = {}) {
+        if (!QnortzInstances.exists(name))
+            QnortzInstances[name] = this
+        else {
+            journal[Failure]("$name already exists.")
+            return
+        }
 
-    fun build(script: Qnortz.() -> Unit) {
+        journal[Task]("Initializing $name. Please wait...")
+
         jda = default(
             token = token,
             enableCoroutines = true,
-            intents = intents
-        ) {
-            setMemberCachePolicy(MemberCachePolicy.ALL)
-            enableCache(CacheFlag.ONLINE_STATUS)
-        }.awaitReady()
+            intents = intents,
+            builder = jdaBuilder
+        ).awaitReady()
 
         for (id in devGuildIdList) {
             val devGuild = jda.getGuildById(id)
             if (devGuild == null) {
-                journal[Failure]("Cannot resolve guild ($id)")
+                journal[Failure]("Cannot resolve a development guild id: $id. Skipping...")
             } else {
                 devGuildList.add(devGuild)
             }
         }
+
         journal[Success](
-            "Following guilds added as dev guild :",
+            "Following guilds added as development guild :",
             *devGuildList.map { "${it.name}(${it.id})" }.toTypedArray()
         )
-
-        QnortzInstances[name] = this
 
         if (::commandManager.isInitialized && ::eventManager.isInitialized) {
             commandManager.init()
@@ -122,7 +103,16 @@ class Qnortz {
             TextCommandReactor(commandManager).script(jda)
             SlashCommandReactor(commandManager).script(jda)
         }
+    }
 
-        script(this)
+    fun terminate(immediate: Boolean) {
+        if (immediate) jda.shutdownNow() else jda.shutdown()
+        QnortzInstances.remove(name)
+        journal[Info]("$name have been successfully terminated.")
+    }
+
+    init {
+        this.apply(qnortzBuilder)
+        journal = Journal("Qnortz/$name")
     }
 }

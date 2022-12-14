@@ -10,4 +10,12 @@ object QnortzInstances {
     operator fun set(key: String, value: Qnortz) {
         instances[key] = value
     }
+
+    fun remove(key: String) {
+        instances.remove(key)
+    }
+
+    fun exists(key: String): Boolean {
+        return instances.contains(key)
+    }
 }

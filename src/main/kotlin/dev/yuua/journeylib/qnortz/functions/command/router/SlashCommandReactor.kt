@@ -17,24 +17,25 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 class SlashCommandReactor(private val manager: CommandManager) : EventStruct {
     override val script: JDA.() -> Unit = {
         listener<SlashCommandInteractionEvent> { event ->
-            val commandFunction = manager.router[CommandRoute(
+            val commandRoute = CommandRoute(
                 event.name,
                 event.subcommandGroup,
                 event.subcommandName
-            )]
+            )
+            val commandFunction = manager.router[commandRoute]
 
             val unifiedEvent = event.toUnified()
 
-            // todo Duplicated code fragment
+            // todo Duplicated code fragment ↓
 
-            val filters = manager.packageFilterRouter.findAll(commandFunction.packageName)
-            val passed = filters.all { it.checkEvent(unifiedEvent) }
-            if (!passed) {
-                it.replyEmbeds(accessForbiddenEmbed(checkResultMessage)).setEphemeral(true).queue()
-                return@listener
-            }
+            // check filter
+            val filters = manager.packageFilterRouter.findAll(manager.findRoutePackage(commandRoute))
+            val packageAllowed = filters.all { it.checkEvent(unifiedEvent) }
+            val commandAllowed = commandFunction.checkFilter(unifiedEvent)
 
-            if (!commandFunction.checkFilter(unifiedEvent)) {
+            println("$packageAllowed $commandAllowed")
+
+            if (!(packageAllowed && commandAllowed)) {
                 event.replyEmbeds(accessForbiddenEmbed()).setEphemeral(true).queue()
                 return@listener
             }

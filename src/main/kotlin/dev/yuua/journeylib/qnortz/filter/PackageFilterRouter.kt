@@ -21,7 +21,9 @@ class PackageFilterRouter<T>(private val rootPackage: String, packageFilter: Pac
      * @param path The **FULL** path to the package.
      * @return [Filter]s
      */
-    fun findAll(path: String): List<Filter<T>> {
+    fun findAll(path: String?): List<Filter<T>> {
+        if (path == null) return emptyList()
+
         val rootPackageSkip = rootPackage.split(".").size
         val splitFullPath = path.split(".")
         val splitPath = splitFullPath.subList(rootPackageSkip, splitFullPath.size)

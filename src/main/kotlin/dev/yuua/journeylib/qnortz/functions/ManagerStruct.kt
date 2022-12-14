@@ -1,7 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions
 
 import dev.yuua.journeylib.qnortz.Qnortz
-import dev.yuua.journeylib.qnortz.filter.PackageFilter
 import dev.yuua.journeylib.qnortz.filter.PackageFilterRouter
 import org.reflections.Reflections
 import java.lang.reflect.Constructor
@@ -14,8 +13,8 @@ interface ManagerStruct<T : FunctionStruct, E> {
 
     val instances: MutableList<T>
 
-    fun add(vararg events: T) {
-        instances.addAll(events)
+    fun addInstance(vararg instance: T) {
+        instances.addAll(instance)
     }
 
     fun init()

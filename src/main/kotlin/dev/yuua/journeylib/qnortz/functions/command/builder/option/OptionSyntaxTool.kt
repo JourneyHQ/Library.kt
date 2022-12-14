@@ -90,9 +90,7 @@ fun analyzeOptions(text: String, optionDataList: List<OptionData>): OptionAnalys
         }
 
         else ->
-            return OptionAnalysisResult(
-                message = "Mixed option syntax found.\nPlease use consistent syntax."
-            )
+            return OptionAnalysisResult(message = "Mixed option syntax found.\nPlease use consistent syntax.")
     }
 
     // required options that is not removed above.

@@ -38,6 +38,14 @@ class CommandManager(
 
     lateinit var router: CommandRouter
 
+    val routePackageMap = hashMapOf<CommandRoute, String>()
+
+    fun findRoutePackage(route: CommandRoute) = routePackageMap.filterKeys {
+        it.command == route.command
+                && it.subcommandGroup == route.subcommandGroup
+                && it.subcommand == route.subcommand
+    }.values.first()
+
     /**
      * Initializes [CommandManager] and registers commands to Discord.
      */
@@ -55,6 +63,9 @@ class CommandManager(
             val packageName = instance::class.java.packageName
             val filters = packageFilterRouter.findAll(packageName)
             val commandObject = instance.command
+            commandObject.routes.map { it.key }.forEach {
+                routePackageMap[it] = packageName
+            }
 
             if (filters.all { it.guildIds.isEmpty() }) {
                 publicCommands.add(commandObject)

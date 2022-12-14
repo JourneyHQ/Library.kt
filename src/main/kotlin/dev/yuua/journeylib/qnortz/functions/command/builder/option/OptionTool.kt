@@ -1,7 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command.builder.option
 
 import dev.minn.jda.ktx.interactions.commands.Option
-import net.dv8tion.jda.api.entities.*
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.*
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel

@@ -20,14 +20,12 @@ data class CommandFunction(
     val slashFunction: SlashFunction?,
     val textFunction: TextFunction?,
     val options: List<OptionData>,
-    val filters: List<UnifiedCommandFilter> //refactor
+    val filters: List<UnifiedCommandFilter>
 ) {
     private val illegalArgs = IllegalArgumentException("One of them must be null and the other must be not null!")
 
     private val slashIsNull = slashFunction == null
     private val textIsNull = textFunction == null
-
-    val packageName: String
 
     val type = when {
         !slashIsNull -> CommandMethodType.SlashCommand
@@ -38,10 +36,6 @@ data class CommandFunction(
     init {
         if (!(slashIsNull xor textIsNull))
             throw illegalArgs
-        packageName = when (type) {
-            CommandMethodType.TextCommand -> textFunction!!::class.java.packageName
-            CommandMethodType.SlashCommand -> slashFunction!!::class.java.packageName
-        }
     }
 
     fun checkChannelType(channelType: ChannelType): Pair<Boolean, MutableList<ChannelType>> {
@@ -53,6 +47,8 @@ data class CommandFunction(
     }
 
     fun checkFilter(event: UnifiedCommandInteractionEvent): Boolean {
-        return filters.map { it.checkEvent(event) }.all { it }
+        return filters.all {
+            println(it.checkEvent(event))
+            it.checkEvent(event) }
     }
 }
