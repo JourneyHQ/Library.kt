@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.interactions.commands.DefaultMemberPermissions
 
-// todo rejection reasons
 class Filter<T>(
     val guildIds: List<String> = emptyList(),
     val channelIds: List<String> = emptyList(),
@@ -31,7 +30,14 @@ class Filter<T>(
     )
 
     // todo support more event types
-    fun checkEvent(event: T): Boolean {
+
+    /**
+     * Checks if [event] satisfies requirements of [Filter].
+     * @param event Event to check
+     * @return List of strings which contain messages to show to users when any requirements are not satisfied.
+     *         Empty when all checks have passed.
+     */
+    fun checkEvent(event: T): List<String> {
         val unifiedCommandEvent = when (event) {
             is UnifiedCommandInteractionEvent -> event
             else -> null
@@ -59,6 +65,6 @@ class Filter<T>(
             containOrEmpty(channelTypes, channelType) to "${notAvailableOnThis("type of channel")} Available on `${channelTypes.joinToString(", ")}`",
             !(guildOnly && !isGuild) to "Only available on guilds.",
             filterScript(event)
-        ).all { it } // todo
+        ).filter { !it.key }.map { it.value }
     }
 }
