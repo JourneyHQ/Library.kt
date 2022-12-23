@@ -15,7 +15,11 @@ import dev.yuua.journeylib.qnortz.functions.command.builder.option.analyzeOption
  *
  * @return Pair of [CommandFunction] and [OptionAnalysisResult].
  */
-fun analyzeTextCommand(prefix: String = ";", commandString: String, router: CommandRouter): Pair<CommandFunction, OptionAnalysisResult> {
+fun analyzeTextCommand(
+    prefix: String = ";",
+    commandString: String,
+    router: CommandRouter
+): TextCommandAnalysisResult {
     // todo prefix config
     if (!commandString.startsWith(prefix))
         throw IllegalArgumentException("Command not starts with prefix!")
@@ -35,6 +39,7 @@ fun analyzeTextCommand(prefix: String = ";", commandString: String, router: Comm
             if (commandRaw.length > command.length)
                 optionRaw = commandRaw.substring("$command ".length)
         }
+
         SubcommandType -> {
             subcommand = args[1]
 
@@ -42,6 +47,7 @@ fun analyzeTextCommand(prefix: String = ";", commandString: String, router: Comm
             if (commandRaw.length > commandStructureRaw.length)
                 optionRaw = commandRaw.substring("$commandRaw ".length)
         }
+
         SubcommandGroupType -> {
             subcommandGroup = args[1]
             subcommand = args[2]
@@ -52,11 +58,17 @@ fun analyzeTextCommand(prefix: String = ";", commandString: String, router: Comm
         }
     }
 
-    val route = CommandRoute(command, subcommandGroup, subcommand)
+    val commandRoute = CommandRoute(command, subcommandGroup, subcommand)
 
-    val commandFunction = router[route]
+    val commandFunction = router[commandRoute]
 
     val options = analyzeOptions(optionRaw ?: "", commandFunction.options)
 
-    return commandFunction to options
+    return TextCommandAnalysisResult(commandRoute, commandFunction, options)
 }
+
+data class TextCommandAnalysisResult(
+    val commandRoute: CommandRoute,
+    val commandFunction: CommandFunction,
+    val optionAnalysisResult: OptionAnalysisResult
+)

@@ -21,9 +21,9 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             val message = event.message
 
             // analyze command string
-            val commandAnalysis = try {
+            val (commandRoute, commandFunction, optionAnalysisResult) = try {
                 analyzeTextCommand(";", message.contentRaw, manager.router)
-            } catch (e: NoSuchElementException) {
+            } catch (_: NoSuchElementException) {
                 // command not found
                 message.replyEmbeds(Embed {
                     title = ":interrobang: Not Found"
@@ -36,8 +36,6 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
                 return@listener
             }
 
-            val commandFunction = commandAnalysis.first
-            val optionAnalysisResult = commandAnalysis.second
             val options = optionAnalysisResult.options
             val optionAnalysisResultMessage = optionAnalysisResult.message
 
@@ -64,12 +62,13 @@ class TextCommandReactor(private val manager: CommandManager) : EventStruct {
             val unifiedEvent = event.toUnified(options)
 
             // check filter
-            val filters = manager.packageFilterRouter.findAll(commandFunction.packageName)
-            val packageAllowed = filters.all { it.checkEvent(unifiedEvent) }
-            val commandAllowed = commandFunction.checkFilter(unifiedEvent)
+            val filters = manager.packageFilterRouter.findAll(manager.findRoutePackage(commandRoute))
+            val packageFilterMessages = filters.map { it.checkEvent(unifiedEvent) }.flatten().distinct()
+            val commandFilterMessages = commandFunction.checkFilter(unifiedEvent)
+            val flattenedMessages = (packageFilterMessages + commandFilterMessages).joinToString("\n") { "* $it" }
 
-            if (packageAllowed && commandAllowed) {
-                message.replyEmbeds(accessForbiddenEmbed()).queue()
+            if (!(packageFilterMessages.isEmpty() && commandFilterMessages.isEmpty())) {
+                message.replyEmbeds(accessForbiddenEmbed(flattenedMessages)).queue()
                 return@listener
             }
 

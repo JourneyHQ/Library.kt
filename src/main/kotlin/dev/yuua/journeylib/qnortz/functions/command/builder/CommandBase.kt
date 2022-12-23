@@ -27,7 +27,7 @@ open class CommandBase<T>(val name: String, val description: String) {
         permissions: List<Permission> = emptyList(),
         channelTypes: List<ChannelType> = emptyList(),
         guildOnly: Boolean = false,
-        script: UnifiedCommandInteractionEvent.() -> Boolean = { true }
+        script: UnifiedCommandInteractionEvent.() -> Pair<Boolean, String> = { true to "" }
     ) {
         filter =
             UnifiedCommandFilter(guildIds, channelIds, userIds, roleIds, permissions, channelTypes, guildOnly, script)

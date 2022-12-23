@@ -46,9 +46,7 @@ data class CommandFunction(
         return !(acceptedOn.isNotEmpty() && acceptedOn.contains(channelType)) to acceptedOn
     }
 
-    fun checkFilter(event: UnifiedCommandInteractionEvent): Boolean {
-        return filters.all {
-            println(it.checkEvent(event))
-            it.checkEvent(event) }
-    }
+    fun checkFilter(event: UnifiedCommandInteractionEvent) = filters.map {
+        it.checkEvent(event)
+    }.flatten().distinct()
 }

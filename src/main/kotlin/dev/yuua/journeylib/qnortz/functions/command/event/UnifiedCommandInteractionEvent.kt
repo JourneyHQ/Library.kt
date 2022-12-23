@@ -147,7 +147,6 @@ data class UnifiedCommandInteractionEvent(
             OptionType.USER -> {
                 //extract ID from the value provided (<@123456789...> -> 123456789...)
                 val id = extractId(userRegex, value.toString())
-                println(guild?.getMemberById(id))
                 when (T::class) {
                     User::class -> jda.getUserById(id)
                     Member::class -> guild?.getMemberById(id)

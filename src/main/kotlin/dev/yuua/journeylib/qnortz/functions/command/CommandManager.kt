@@ -1,6 +1,5 @@
 package dev.yuua.journeylib.qnortz.functions.command
 
-import dev.minn.jda.ktx.interactions.commands.updateCommands
 import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.Qnortz
 import dev.yuua.journeylib.qnortz.filter.PackageFilterRouter
@@ -38,7 +37,7 @@ class CommandManager(
 
     lateinit var router: CommandRouter
 
-    val routePackageMap = hashMapOf<CommandRoute, String>()
+    private val routePackageMap = hashMapOf<CommandRoute, String>()
 
     fun findRoutePackage(route: CommandRoute) = routePackageMap.filterKeys {
         it.command == route.command
@@ -53,6 +52,7 @@ class CommandManager(
         val jda = qnortz.jda
 
         val publicCommands = mutableListOf<CommandObject>()
+
         val guildCommands = hashMapOf<String, MutableList<CommandObject>>()
         // initialize guilds for guild commands
         jda.guilds.forEach {
@@ -61,18 +61,24 @@ class CommandManager(
 
         instances.forEach { instance ->
             val packageName = instance::class.java.packageName
-            val filters = packageFilterRouter.findAll(packageName)
+            val packageFilters = packageFilterRouter.findAll(packageName)
             val commandObject = instance.command
+
+            // Save this to use later
             commandObject.routes.map { it.key }.forEach {
                 routePackageMap[it] = packageName
             }
 
-            if (filters.all { it.guildIds.isEmpty() }) {
-                publicCommands.add(commandObject)
+            if (packageFilters.all { it.guildIds.isEmpty() }) { // todo subcommand guild filter
+                if (qnortz.isDev)
+                    guildCommands.forEach { (guildId, _) ->
+                        guildCommands[guildId]!!.add(commandObject)
+                    }
+                else publicCommands.add(commandObject)
             } else {
-                val guildIdLists = filters.map { it.guildIds }.filter { it.isNotEmpty() }
-                val allGuildIds = guildIdLists.flatten().distinct()
+                val guildIdLists = packageFilters.map { it.guildIds }.filter { it.isNotEmpty() }
 
+                // extract common guild ids
                 var commonGuildIds = guildIdLists.first().toSet()
                 for ((index, guildIds) in guildIdLists.withIndex()) {
                     if (index == 0) continue
@@ -88,17 +94,16 @@ class CommandManager(
 
         val router = CommandRouter()
 
-        for (publicCommand in publicCommands)
-            publicCommand.routes.forEach { (commandRoute, commandFunction) ->
-                if (qnortz.isDevEnv)
-                    commandRoute.command = qnortz.devPrefix + commandRoute.command // apply dev prefix
-                router[commandRoute] = commandFunction
-            }
+        if (!qnortz.isDev)
+            for (publicCommand in publicCommands)
+                publicCommand.routes.forEach { (commandRoute, commandFunction) ->
+                    router[commandRoute] = commandFunction
+                }
 
         for (guildCommand in guildCommands)
             guildCommand.value.forEach {
                 it.routes.forEach { (commandRoute, commandFunction) ->
-                    if (qnortz.isDevEnv)
+                    if (qnortz.isDev)
                         commandRoute.command = qnortz.devPrefix + commandRoute.command // apply dev prefix
                     router[commandRoute] = commandFunction
                 }
@@ -120,39 +125,20 @@ class CommandManager(
                 })
             }
 
-            val devPublicCommandUpdateTask: TaskCoroutine = {
-                val devPublicCommands = publicCommands.map {
-                    // apply dev prefix
-                    it.commandData.apply { name = qnortz.devPrefix + name }
-                }
-
-                for (guild in qnortz.devGuildList) {
-                    guild.updateCommands {
-                        addCommands(devPublicCommands)
-                    }.queue({
-                        journal[Success](
-                            "Following public commands updated successfully (dev/${guild.name}):",
-                            *it.map { command -> "${command.name}(${command.description})" }.toTypedArray()
-                        )
-                    }, {
-                        journal[Failure]("Updating public commands failed because of following reasons:")
-                        throw it
-                    })
-                }
-            }
-
             //update private commands
             val privateCommandsUpdateTask: TaskCoroutine = {
                 for ((guildId, privateCommands) in guildCommands) {
                     // dev-env && this guild is not a dev guild.
-                    if (qnortz.isDevEnv && !qnortz.devGuildList.map { it.id }.contains(guildId)) {
-                        journal[Info]("Guild($guildId) is not a dev guild. Skipping private command update...")
+
+                    val guild = jda.getGuildById(guildId)
+
+                    if (guild == null) {
+                        journal[Failure]("Cannot resolve Guild($guildId). Skipping private command update...")
                         continue
                     }
 
-                    val guild = jda.getGuildById(guildId)
-                    if (guild == null) {
-                        journal[Failure]("Cannot resolve Guild($guildId). Skipping private command update...")
+                    if (qnortz.isDev && !qnortz.devGuildList.map { it.id }.contains(guildId)) {
+                        journal[Info]("${guild.name}($guildId) is not a dev guild. Skipping private command update...")
                         continue
                     }
 
@@ -161,12 +147,12 @@ class CommandManager(
                     guild.updateCommands().addCommands(
                         privateCommands.map {
                             it.commandData.apply {
-                                if (qnortz.isDevEnv) name = qnortz.devPrefix + name
+                                if (qnortz.isDev) name = qnortz.devPrefix + name
                             }
                         }
                     ).queue({
                         journal[Success](
-                            "Following private commands for ${guild.name}($guildId) updated successfully ${if (qnortz.isDevEnv) "(dev) " else ""}:",
+                            "Following private commands for ${guild.name}($guildId) updated successfully ${if (qnortz.isDev) "(dev) " else ""}:",
                             *it.map { command -> "${command.name}(${command.description})" }.toTypedArray()
                         )
                     }, {
@@ -178,7 +164,7 @@ class CommandManager(
 
             jda.guilds.filter { guildCommands[it.id]!!.isEmpty() }.forEach { it.updateCommands().complete() }
 
-            launch(block = if (!qnortz.isDevEnv) publicCommandUpdateTask else devPublicCommandUpdateTask)
+            if (!qnortz.isDev) launch(block = publicCommandUpdateTask)
             launch(block = privateCommandsUpdateTask)
         }
 

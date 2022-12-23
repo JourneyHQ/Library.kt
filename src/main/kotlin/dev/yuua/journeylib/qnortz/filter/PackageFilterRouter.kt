@@ -14,6 +14,7 @@ class PackageFilterRouter<T>(private val rootPackage: String, packageFilter: Pac
 
     init {
         expandPackageFilter(packageFilter = packageFilter)
+        println(filterPaths.map { it.key })
     }
 
     /**
@@ -30,7 +31,7 @@ class PackageFilterRouter<T>(private val rootPackage: String, packageFilter: Pac
         val filters = mutableListOf<Filter<T>>()
 
         repeat(splitPath.size) {
-            val filter = filterPaths[splitPath.subList(0, it).joinToString(".")]
+            val filter = filterPaths[splitPath.subList(0, it + 1).joinToString(".")]
             if (filter != null) filters += filter
         }
 

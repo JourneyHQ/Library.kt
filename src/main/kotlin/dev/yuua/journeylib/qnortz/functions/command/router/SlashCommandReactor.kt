@@ -30,13 +30,12 @@ class SlashCommandReactor(private val manager: CommandManager) : EventStruct {
 
             // check filter
             val filters = manager.packageFilterRouter.findAll(manager.findRoutePackage(commandRoute))
-            val packageAllowed = filters.all { it.checkEvent(unifiedEvent) }
-            val commandAllowed = commandFunction.checkFilter(unifiedEvent)
+            val packageFilterMessages = filters.map { it.checkEvent(unifiedEvent) }.flatten().distinct()
+            val commandFilterMessages = commandFunction.checkFilter(unifiedEvent)
+            val flattenedMessages = (packageFilterMessages + commandFilterMessages).joinToString("\n") { "* $it" }
 
-            println("$packageAllowed $commandAllowed")
-
-            if (!(packageAllowed && commandAllowed)) {
-                event.replyEmbeds(accessForbiddenEmbed()).setEphemeral(true).queue()
+            if (!(packageFilterMessages.isEmpty() && commandFilterMessages.isEmpty())) {
+                event.replyEmbeds(accessForbiddenEmbed(flattenedMessages)).setEphemeral(true).queue()
                 return@listener
             }
 

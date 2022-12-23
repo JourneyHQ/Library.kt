@@ -52,13 +52,13 @@ class Qnortz(
     }
 
     // Development Environment
-    var isDevEnv = false
+    var isDev = false
     lateinit var devPrefix: String
     private val devGuildIdList = mutableListOf<String>()
     val devGuildList = mutableListOf<Guild>()
 
     fun devEnv(devPrefix: String, vararg devGuildIdList: String) {
-        isDevEnv = true
+        isDev = true
         this.devPrefix = devPrefix
         this.devGuildIdList.addAll(devGuildIdList)
     }
