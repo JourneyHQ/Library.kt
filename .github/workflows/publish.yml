@@ -40,7 +40,7 @@ jobs:
           description: "[${{ github.workflow }}](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})"
           color: 0xeaa6e9
       - name: 📻 Setup JDK16
-        uses: actions/setup-java@v3.0.0
+        uses: actions/setup-java@v3.10.0
         with:
           distribution: "zulu"
           java-version: ${{ env.jdk }}
