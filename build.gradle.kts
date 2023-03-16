@@ -32,7 +32,7 @@ dependencies {
     implementation("com.sedmelluq:lavaplayer:1.3.77")
     implementation("com.vdurmont:emoji-java:5.1.1")
 
-    implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
+    implementation("ch.qos.logback:logback-classic:1.4.6")
     implementation("org.json:json:20211205")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("args4j:args4j:2.33")
