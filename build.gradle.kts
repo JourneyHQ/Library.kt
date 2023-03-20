@@ -26,7 +26,7 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.9")
+    implementation("net.dv8tion:JDA:5.0.0-beta.6")
     implementation("com.github.minndevelopment:jda-ktx:9f01b74")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
     implementation("com.sedmelluq:lavaplayer:1.3.77")
