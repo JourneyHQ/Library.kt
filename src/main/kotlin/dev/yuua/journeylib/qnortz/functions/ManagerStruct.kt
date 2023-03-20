@@ -9,7 +9,6 @@ interface ManagerStruct<T : FunctionStruct, E> {
     val qnortz: Qnortz
     val name: String
     val functionPackage: String
-    val packageFilterRouter: PackageFilterRouter<E>
 
     val instances: MutableList<T>
 

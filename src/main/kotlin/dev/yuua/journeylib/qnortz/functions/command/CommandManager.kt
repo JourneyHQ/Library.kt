@@ -26,7 +26,7 @@ typealias TaskCoroutine = CoroutineScope.() -> Unit
 class CommandManager(
     override val qnortz: Qnortz,
     override val functionPackage: String,
-    override val packageFilterRouter: PackageFilterRouter<UnifiedCommandInteractionEvent>
+    val packageFilterRouter: PackageFilterRouter<UnifiedCommandInteractionEvent>
 ) : ManagerStruct<CommandStruct, UnifiedCommandInteractionEvent> {
 
     override val name = "Command"
@@ -62,14 +62,21 @@ class CommandManager(
         instances.forEach { instance ->
             val packageName = instance::class.java.packageName
             val packageFilters = packageFilterRouter.findAll(packageName)
-            val commandObject = instance.command
+            val commandObject = instance.command.apply {
+                // Apply dev prefix
+                if (qnortz.isDev) {
+                    routes.keys.forEach { route -> route.command = qnortz.devPrefix + route.command }
+                    commandData.name = qnortz.devPrefix + commandData.name
+                }
+            }
 
             // Save this to use later
             commandObject.routes.map { it.key }.forEach {
                 routePackageMap[it] = packageName
             }
 
-            if (packageFilters.all { it.guildIds.isEmpty() }) { // todo subcommand guild filter
+            if (packageFilters.all { it.guildIds.isEmpty() }) { // if the command has no guild restriction -> public command
+                // todo subcommand guild filter
                 if (qnortz.isDev)
                     guildCommands.forEach { (guildId, _) ->
                         guildCommands[guildId]!!.add(commandObject)
@@ -103,8 +110,8 @@ class CommandManager(
         for (guildCommand in guildCommands)
             guildCommand.value.forEach {
                 it.routes.forEach { (commandRoute, commandFunction) ->
-                    if (qnortz.isDev)
-                        commandRoute.command = qnortz.devPrefix + commandRoute.command // apply dev prefix
+//                    if (qnortz.isDev)
+//                        commandRoute.command = qnortz.devPrefix + commandRoute.command // apply dev prefix
                     router[commandRoute] = commandFunction
                 }
             }
@@ -147,7 +154,7 @@ class CommandManager(
                     guild.updateCommands().addCommands(
                         privateCommands.map {
                             it.commandData.apply {
-                                if (qnortz.isDev) name = qnortz.devPrefix + name
+                                //if (qnortz.isDev) name = qnortz.devPrefix + name
                             }
                         }
                     ).queue({

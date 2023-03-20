@@ -13,7 +13,6 @@ import dev.yuua.journeylib.qnortz.functions.event.EventManager
 import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Guild
-import net.dv8tion.jda.api.events.GenericEvent
 import net.dv8tion.jda.api.requests.GatewayIntent
 
 /**
@@ -44,10 +43,9 @@ class Qnortz(
 
     private lateinit var eventManager: EventManager
     fun enableEvents(
-        functionPackage: String,
-        packageFilter: PackageFilter<GenericEvent> = PackageFilter()
+        functionPackage: String
     ): EventManager {
-        eventManager = EventManager(this, functionPackage, PackageFilterRouter(functionPackage, packageFilter))
+        eventManager = EventManager(this, functionPackage)
         return eventManager
     }
 
@@ -57,19 +55,18 @@ class Qnortz(
     private val devGuildIdList = mutableListOf<String>()
     val devGuildList = mutableListOf<Guild>()
 
-    fun devEnv(devPrefix: String, vararg devGuildIdList: String) {
+    fun enableDevEnv(devPrefix: String, vararg devGuildIdList: String) {
         isDev = true
         this.devPrefix = devPrefix
         this.devGuildIdList.addAll(devGuildIdList)
     }
 
     // Builders
-    fun build(jdaBuilder: JDABuilder.() -> Unit = {}) {
-        if (!QnortzInstances.exists(name))
+    fun build(jdaBuilder: JDABuilder.() -> Unit = {}): Qnortz {
+        if (!QnortzInstances.exists(name)) {
             QnortzInstances[name] = this
-        else {
-            journal[Failure]("$name already exists.")
-            return
+        } else {
+            throw UnsupportedOperationException("$name already exists.")
         }
 
         journal[Task]("Initializing $name. Please wait...")
@@ -98,11 +95,15 @@ class Qnortz(
         if (::commandManager.isInitialized && ::eventManager.isInitialized) {
             commandManager.init()
             eventManager.init()
+            TextCommandReactor(commandManager).script(jda)
+            SlashCommandReactor(commandManager).script(jda) //todo
         } else if (::commandManager.isInitialized && !::eventManager.isInitialized) {
             commandManager.init()
             TextCommandReactor(commandManager).script(jda)
             SlashCommandReactor(commandManager).script(jda)
         }
+
+        return this
     }
 
     fun terminate(immediate: Boolean) {

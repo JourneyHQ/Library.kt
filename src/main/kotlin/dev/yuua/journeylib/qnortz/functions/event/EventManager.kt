@@ -11,8 +11,7 @@ import net.dv8tion.jda.api.events.GenericEvent
  */
 class EventManager(
     override val qnortz: Qnortz,
-    override val functionPackage: String,
-    override val packageFilterRouter: PackageFilterRouter<GenericEvent>
+    override val functionPackage: String
 ) : ManagerStruct<EventStruct, GenericEvent> {
 
     override val name = "Event"
