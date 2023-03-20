@@ -1,5 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command.builder
 
+import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.yuua.journeylib.qnortz.filter.Filter
 import dev.yuua.journeylib.qnortz.functions.command.builder.function.SlashFunction
 import dev.yuua.journeylib.qnortz.functions.command.builder.function.TextFunction
@@ -7,9 +8,11 @@ import dev.yuua.journeylib.qnortz.functions.command.builder.option.OptionTool
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.ChannelType
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
+typealias AutocompleteFunction = suspend CoroutineEventListener.(CommandAutoCompleteInteractionEvent) -> Unit
 
 /**
  * Creates [CommandBase] instance.
@@ -38,6 +41,30 @@ open class CommandBaseWithFunction<T>(name: String, description: String) : Comma
     var slashFunction: SlashFunction? = null
     var textFunction: TextFunction? = null
     val jdaOptions = mutableListOf<OptionData>()
+    val autocompletes = hashMapOf<String, AutocompleteFunction>()
+
+    /**
+     * Adds the option to the command. (for Kotlin)
+     *
+     * @param name The name of the command.
+     * @param description The description of the command.
+     * @param required Whether the option is required or not.
+     * @param autocomplete Whether the option supports autocomplete.
+     * @param script The script which is applied to [OptionData]
+     */
+    inline fun <reified T> option(
+        name: String,
+        description: String,
+        required: Boolean = false,
+        script: OptionData.() -> Unit = {},
+        noinline autocomplete: AutocompleteFunction? = null
+    ) {
+        val jdaOption = OptionTool.option<T>(name, description, required, autocomplete != null, script)
+
+        if (autocomplete != null) autocompletes[name] = autocomplete
+
+        jdaOptions.add(jdaOption)
+    }
 
     /**
      * Adds options to the command. (for Java)
@@ -46,26 +73,6 @@ open class CommandBaseWithFunction<T>(name: String, description: String) : Comma
      */
     fun options(vararg options: OptionData) {
         this.jdaOptions.addAll(options)
-    }
-
-    /**
-     * Adds the option to the command. (for Kotlin)
-     *
-     * @param name The name of the command.
-     * @param description The description of the command.
-     * @param required Whether the option is required or not.
-     * @param autocomplete Whether the option supports auto-complete.
-     * @param script The script which is applied to [OptionData]
-     */
-    inline fun <reified T> option(
-        name: String,
-        description: String,
-        required: Boolean = false,
-        autocomplete: Boolean = false,
-        script: OptionData.() -> Unit = {}
-    ) {
-        val jdaOption = OptionTool.option<T>(name, description, required, autocomplete, script)
-        jdaOptions.add(jdaOption)
     }
 
     /**

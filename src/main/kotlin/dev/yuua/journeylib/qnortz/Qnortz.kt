@@ -92,15 +92,18 @@ class Qnortz(
             *devGuildList.map { "${it.name}(${it.id})" }.toTypedArray()
         )
 
-        if (::commandManager.isInitialized && ::eventManager.isInitialized) {
-            commandManager.init()
-            eventManager.init()
-            TextCommandReactor(commandManager).script(jda)
-            SlashCommandReactor(commandManager).script(jda) //todo
-        } else if (::commandManager.isInitialized && !::eventManager.isInitialized) {
+        if (::commandManager.isInitialized) {
             commandManager.init()
             TextCommandReactor(commandManager).script(jda)
             SlashCommandReactor(commandManager).script(jda)
+
+            journal[Success]("Command manager initialized.")
+        }
+
+        if (::eventManager.isInitialized) {
+            eventManager.init()
+
+            journal[Success]("Event manager initialized.")
         }
 
         return this

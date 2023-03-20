@@ -3,7 +3,7 @@ package dev.yuua.journeylib.qnortz
 import net.dv8tion.jda.api.JDA
 import java.awt.Color
 
-fun code(context: String) = "*$context*"
+fun code(context: String) = "`$context`"
 
 fun codeBlock(context: String) = "```\n$context\n```"
 
@@ -26,5 +26,3 @@ enum class QnortzColor(val color: Color) {
 
     fun int() = color.rgb
 }
-
-fun JDA.resolveGuild(id: String) = this.getGuildById(id) != null

@@ -1,6 +1,7 @@
 package dev.yuua.journeylib.qnortz.functions.command.builder.function
 
 import dev.yuua.journeylib.qnortz.functions.command.CommandMethodType
+import dev.yuua.journeylib.qnortz.functions.command.builder.AutocompleteFunction
 import dev.yuua.journeylib.qnortz.functions.command.builder.UnifiedCommandFilter
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import net.dv8tion.jda.api.entities.channel.ChannelType
@@ -20,6 +21,7 @@ data class CommandFunction(
     val slashFunction: SlashFunction?,
     val textFunction: TextFunction?,
     val options: List<OptionData>,
+    val autocompletes: HashMap<String, AutocompleteFunction>,
     val filters: List<UnifiedCommandFilter>
 ) {
     private val illegalArgs = IllegalArgumentException("One of them must be null and the other must be not null!")
@@ -47,6 +49,6 @@ data class CommandFunction(
     }
 
     fun checkFilter(event: UnifiedCommandInteractionEvent) = filters.map {
-        it.checkEvent(event)
+        it.check(event)
     }.flatten().distinct()
 }

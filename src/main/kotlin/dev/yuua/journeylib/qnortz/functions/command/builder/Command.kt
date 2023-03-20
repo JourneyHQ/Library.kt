@@ -94,7 +94,8 @@ class Command : CommandBaseWithFunction<Command> {
             subcommand: String?,
             slashFunction: SlashFunction?,
             textFunction: TextFunction?,
-            options: MutableList<OptionData>,
+            options: List<OptionData>,
+            autocompletes: HashMap<String, AutocompleteFunction>,
             vararg filter: UnifiedCommandFilter?
         ) {
             routes[CommandRoute(name, subcommandGroup, subcommand)] =
@@ -102,6 +103,7 @@ class Command : CommandBaseWithFunction<Command> {
                     slashFunction,
                     textFunction,
                     options,
+                    autocompletes,
                     filter.filterNotNull()
                 )
         }
@@ -111,7 +113,7 @@ class Command : CommandBaseWithFunction<Command> {
             CommandType -> {
                 addRoute(
                     null, null,
-                    slashFunction, textFunction, jdaOptions, filter
+                    slashFunction, textFunction, jdaOptions, autocompletes, filter
                 )
                 command = Command(name, description) SlashCommand@{
                     restrict(filter.guildOnly, filter.defaultMemberPermissions)
@@ -129,7 +131,7 @@ class Command : CommandBaseWithFunction<Command> {
                         addRoute(
                             null, subcommand.name,
                             subcommand.slashFunction, subcommand.textFunction,
-                            subcommand.jdaOptions,
+                            subcommand.jdaOptions, subcommand.autocompletes,
                             filter, subcommand.filter
                         )
                     }
@@ -148,7 +150,7 @@ class Command : CommandBaseWithFunction<Command> {
                                 addRoute(
                                     subcommandGroup.name, subcommand.name,
                                     subcommand.slashFunction, subcommand.textFunction,
-                                    subcommand.jdaOptions,
+                                    subcommand.jdaOptions, subcommand.autocompletes,
                                     filter, subcommandGroup.filter, subcommand.filter
                                 )
                             }

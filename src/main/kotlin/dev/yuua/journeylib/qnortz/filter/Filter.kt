@@ -1,5 +1,6 @@
 package dev.yuua.journeylib.qnortz.filter
 
+import dev.yuua.journeylib.qnortz.code
 import dev.yuua.journeylib.qnortz.functions.command.event.UnifiedCommandInteractionEvent
 import net.dv8tion.jda.api.Permission
 import net.dv8tion.jda.api.entities.channel.ChannelType
@@ -13,11 +14,11 @@ class Filter<T>(
     val permissions: List<Permission> = emptyList(),
     val channelTypes: List<ChannelType> = emptyList(),
     val guildOnly: Boolean = false,
-    val filterScript: T.() -> Pair<Boolean,String> = { true to "" }
+    val filterScript: T.() -> Pair<Boolean, String> = { true to "" }
 ) {
     val defaultMemberPermissions = DefaultMemberPermissions.enabledFor(permissions)
 
-    private fun <T> containOrEmpty(list: List<T>, id: T?) = list.isEmpty() || list.contains(id)
+    private infix fun <T> List<T>.containOrEmpty(id: T?) = this.isEmpty() || this.contains(id)
 
     data class FilterElements(
         val guildId: String?,
@@ -37,7 +38,7 @@ class Filter<T>(
      * @return List of strings which contain messages to show to users when any requirements are not satisfied.
      *         Empty when all checks have passed.
      */
-    fun checkEvent(event: T): List<String> {
+    fun check(event: T): List<String> {
         val unifiedCommandEvent = when (event) {
             is UnifiedCommandInteractionEvent -> event
             else -> null
@@ -57,12 +58,12 @@ class Filter<T>(
         val youDontHavePermissions = "You don't have permissions."
 
         return hashMapOf(
-            containOrEmpty(guildIds, guildId) to notAvailableOnThis("guild"),
-            containOrEmpty(channelIds, channelId) to notAvailableOnThis("channel"),
-            containOrEmpty(userIds, userId) to youDontHavePermissions,
+            guildIds containOrEmpty guildId to notAvailableOnThis("guild"),
+            channelIds containOrEmpty channelId to notAvailableOnThis("channel"),
+            userIds containOrEmpty userId to youDontHavePermissions,
             (roleIds.isEmpty() || userRoleIds.any { roleIds.contains(it) }) to youDontHavePermissions,
             (permissions.isEmpty() || userPermissions.containsAll(permissions)) to youDontHavePermissions,
-            containOrEmpty(channelTypes, channelType) to "${notAvailableOnThis("type of channel")} Available on `${channelTypes.joinToString(", ")}`",
+            channelTypes containOrEmpty channelType to "${notAvailableOnThis("type of channel")} Available on ${code(channelTypes.joinToString(", "))}",
             !(guildOnly && !isGuild) to "Only available on guilds.",
             filterScript(event)
         ).filter { !it.key }.map { it.value }

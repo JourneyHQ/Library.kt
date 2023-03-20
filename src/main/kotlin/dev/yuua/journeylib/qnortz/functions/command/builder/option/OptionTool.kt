@@ -1,9 +1,11 @@
 package dev.yuua.journeylib.qnortz.functions.command.builder.option
 
+import dev.minn.jda.ktx.events.CoroutineEventListener
 import dev.minn.jda.ktx.interactions.commands.Option
 import net.dv8tion.jda.api.entities.channel.ChannelType
 import net.dv8tion.jda.api.entities.channel.concrete.*
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.commands.build.OptionData
 
@@ -52,5 +54,9 @@ object OptionTool {
             jdaOption.setChannelTypes(toChannelTypes<T>())
 
         return jdaOption
+    }
+
+    fun OptionData.autoComplete(consumer: suspend CoroutineEventListener.(CommandAutoCompleteInteractionEvent) -> Unit) {
+
     }
 }

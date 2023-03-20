@@ -1,5 +1,6 @@
 package dev.yuua.journeylib.qnortz.functions.command
 
+import dev.minn.jda.ktx.events.onCommandAutocomplete
 import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.Qnortz
 import dev.yuua.journeylib.qnortz.filter.PackageFilterRouter
@@ -40,9 +41,7 @@ class CommandManager(
     private val routePackageMap = hashMapOf<CommandRoute, String>()
 
     fun findRoutePackage(route: CommandRoute) = routePackageMap.filterKeys {
-        it.command == route.command
-                && it.subcommandGroup == route.subcommandGroup
-                && it.subcommand == route.subcommand
+        it.command == route.command && it.subcommandGroup == route.subcommandGroup && it.subcommand == route.subcommand
     }.values.first()
 
     /**
@@ -52,8 +51,8 @@ class CommandManager(
         val jda = qnortz.jda
 
         val publicCommands = mutableListOf<CommandObject>()
-
         val guildCommands = hashMapOf<String, MutableList<CommandObject>>()
+
         // initialize guilds for guild commands
         jda.guilds.forEach {
             guildCommands[it.id] = mutableListOf()
@@ -67,6 +66,16 @@ class CommandManager(
                 if (qnortz.isDev) {
                     routes.keys.forEach { route -> route.command = qnortz.devPrefix + route.command }
                     commandData.name = qnortz.devPrefix + commandData.name
+                }
+            }
+
+            commandObject.routes.forEach { (route, function) ->
+                for (autocomplete in function.autocompletes) {
+                    jda.onCommandAutocomplete(route.command, autocomplete.key) {
+                        if (it.name == route.command && it.subcommandGroup == route.subcommandGroup && it.subcommandName == route.subcommand) {
+                            autocomplete.value.invoke(this, it)
+                        }
+                    }
                 }
             }
 
@@ -110,8 +119,6 @@ class CommandManager(
         for (guildCommand in guildCommands)
             guildCommand.value.forEach {
                 it.routes.forEach { (commandRoute, commandFunction) ->
-//                    if (qnortz.isDev)
-//                        commandRoute.command = qnortz.devPrefix + commandRoute.command // apply dev prefix
                     router[commandRoute] = commandFunction
                 }
             }
@@ -152,11 +159,7 @@ class CommandManager(
                     if (privateCommands.isEmpty()) continue
 
                     guild.updateCommands().addCommands(
-                        privateCommands.map {
-                            it.commandData.apply {
-                                //if (qnortz.isDev) name = qnortz.devPrefix + name
-                            }
-                        }
+                        privateCommands.map { it.commandData }
                     ).queue({
                         journal[Success](
                             "Following private commands for ${guild.name}($guildId) updated successfully ${if (qnortz.isDev) "(dev) " else ""}:",
@@ -187,9 +190,7 @@ class CommandRouter : FunctionRouter<CommandRoute, CommandFunction, CommandStruc
 
     override fun get(route: CommandRoute): CommandFunction {
         val routeEntry = routes.filterKeys {
-            it.command == route.command
-                    && it.subcommandGroup == route.subcommandGroup
-                    && it.subcommand == route.subcommand
+            it.command == route.command && it.subcommandGroup == route.subcommandGroup && it.subcommand == route.subcommand
         }.entries.firstOrNull() ?: throw routeNotFoundError
 
         return routeEntry.value

@@ -8,12 +8,10 @@ import net.dv8tion.jda.api.entities.channel.ChannelType
 fun invalidChannelTypeEmbed(acceptedOn: List<ChannelType>) =
     Embed {
         title = ":interrobang: Invalid Channel Type!"
-        description = codeBlock(
-            """
+        description = codeBlock("""
             Following channel types are accepted:
             ${acceptedOn.joinToString(" , ")}
-            """.trimIndent()
-        )
+        """.trimIndent())
         color = QnortzColor.Red.int()
     }
 
