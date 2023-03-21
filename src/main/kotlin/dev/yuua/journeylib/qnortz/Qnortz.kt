@@ -76,9 +76,9 @@ class Qnortz(
     private lateinit var lavaBuilder: LavaKordOptions.() -> Unit
 
     fun enableLavakord(
-        executor: CoroutineContext?,
-        options: MutableLavaKordOptions,
-        builder: LavaKordOptions.() -> Unit
+        executor: CoroutineContext? = null,
+        options: MutableLavaKordOptions = MutableLavaKordOptions(),
+        builder: LavaKordOptions.() -> Unit = {}
     ) {
         lavaExecutor = executor
         lavaOptions = options
