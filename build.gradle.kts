@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.6.10"
+    kotlin("jvm") version "1.7.10"
     `maven-publish`
 }
 
@@ -26,22 +26,23 @@ repositories {
 dependencies {
     testImplementation(kotlin("test"))
 
-    implementation("net.dv8tion:JDA:5.0.0-alpha.9")
-    implementation("com.github.minndevelopment:jda-ktx:9f01b74")
+    implementation("net.dv8tion:JDA:5.0.0-alpha.22")
+    implementation("com.github.minndevelopment:jda-ktx:fc7d7de")
     implementation("com.jagrosh:jda-utilities-commons:3.1.0")
-    implementation("com.sedmelluq:lavaplayer:1.3.77")
     implementation("com.vdurmont:emoji-java:5.1.1")
 
-    implementation("ch.qos.logback:logback-classic:1.3.0-alpha14")
-    implementation("org.json:json:20211205")
+    implementation("ch.qos.logback:logback-classic:1.4.4")
+    implementation("com.github.ajalt.mordant:mordant:2.0.0-beta5")
+    implementation("org.json:json:20220924")
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("args4j:args4j:2.33")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.reflections:reflections:0.10.2")
 
     implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.5")
+    implementation("io.ktor:ktor-client-core:2.1.2")
+    implementation("io.ktor:ktor-client-cio:2.1.2")
     implementation("org.jraf:klibnotion:1.11.0")
-
 }
 
 tasks.test {
