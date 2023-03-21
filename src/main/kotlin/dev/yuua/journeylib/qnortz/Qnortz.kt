@@ -1,11 +1,9 @@
 package dev.yuua.journeylib.qnortz
 
 import dev.minn.jda.ktx.jdabuilder.default
-import dev.minn.jda.ktx.jdabuilder.injectKTX
 import dev.schlaubi.lavakord.LavaKord
 import dev.schlaubi.lavakord.LavaKordOptions
 import dev.schlaubi.lavakord.MutableLavaKordOptions
-import dev.schlaubi.lavakord.jda.buildWithLavakord
 import dev.yuua.journeylib.journal.Journal
 import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.filter.PackageFilter
@@ -20,7 +18,6 @@ import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.requests.GatewayIntent
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.Duration
 
 /**
  * @param name The name of the Qnortz instance.
@@ -68,26 +65,8 @@ class Qnortz(
         this.devGuildIdList.addAll(devGuildIdList)
     }
 
-    lateinit var lavakord: LavaKord
-
-    private var enableLavakord = false
-    private var lavaExecutor: CoroutineContext? = null
-    private lateinit var lavaOptions: MutableLavaKordOptions
-    private lateinit var lavaBuilder: LavaKordOptions.() -> Unit
-
-    fun enableLavakord(
-        executor: CoroutineContext? = null,
-        options: MutableLavaKordOptions = MutableLavaKordOptions(),
-        builder: LavaKordOptions.() -> Unit = {}
-    ) {
-        lavaExecutor = executor
-        lavaOptions = options
-        lavaBuilder = builder
-        enableLavakord = true
-    }
-
     // Builders
-    suspend fun build(jdaBuilder: JDABuilder.() -> Unit = {}): Qnortz {
+    fun build(jdaBuilder: JDABuilder.() -> Unit = {}): Qnortz {
         if (!QnortzInstances.exists(name)) {
             QnortzInstances[name] = this
         } else {
@@ -96,22 +75,12 @@ class Qnortz(
 
         journal[Task]("Initializing $name. Please wait...")
 
-        jda = if (enableLavakord) {
-            val l = JDABuilder.createDefault(token, intents)
-                .apply(jdaBuilder)
-                .apply {
-                    injectKTX(timeout = Duration.INFINITE)
-                }.buildWithLavakord()
-            lavakord = l.lavakord
-            l.jda.awaitReady()
-        } else {
-            default(
-                token = token,
-                enableCoroutines = true,
-                intents = intents,
-                builder = jdaBuilder
-            ).awaitReady()
-        }
+        jda = default(
+            token = token,
+            enableCoroutines = true,
+            intents = intents,
+            builder = jdaBuilder
+        ).awaitReady()
 
         for (id in devGuildIdList) {
             val devGuild = jda.getGuildById(id)

@@ -28,7 +28,6 @@ dependencies {
 
     implementation("net.dv8tion:JDA:5.0.0-beta.1")
     implementation("com.github.minndevelopment:jda-ktx:9fc90f6")
-    implementation("dev.schlaubi.lavakord:jda-jvm:3.8.0")
 
     implementation("ch.qos.logback:logback-classic:1.4.4")
     implementation("com.github.ajalt.mordant:mordant:2.0.0-beta5")
