@@ -1,9 +1,6 @@
 package dev.yuua.journeylib.qnortz
 
 import dev.minn.jda.ktx.jdabuilder.default
-import dev.schlaubi.lavakord.LavaKord
-import dev.schlaubi.lavakord.LavaKordOptions
-import dev.schlaubi.lavakord.MutableLavaKordOptions
 import dev.yuua.journeylib.journal.Journal
 import dev.yuua.journeylib.journal.Journal.Symbols.*
 import dev.yuua.journeylib.qnortz.filter.PackageFilter
@@ -17,7 +14,6 @@ import net.dv8tion.jda.api.JDA
 import net.dv8tion.jda.api.JDABuilder
 import net.dv8tion.jda.api.entities.Guild
 import net.dv8tion.jda.api.requests.GatewayIntent
-import kotlin.coroutines.CoroutineContext
 
 /**
  * @param name The name of the Qnortz instance.
