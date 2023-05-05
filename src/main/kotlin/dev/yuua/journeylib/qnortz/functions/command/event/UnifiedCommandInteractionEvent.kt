@@ -15,6 +15,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent
 import net.dv8tion.jda.api.interactions.commands.OptionType
 import net.dv8tion.jda.api.interactions.components.LayoutComponent
 import net.dv8tion.jda.api.utils.FileUpload
+import net.dv8tion.jda.api.utils.messages.MessageCreateData
 
 /**
  * Command interaction event which supports both [SlashCommandInteractionEvent] and [MessageReceivedEvent].
@@ -44,6 +45,23 @@ data class UnifiedCommandInteractionEvent(
 ) {
     private val slash = jdaEvent.slashCommandInteractionEvent
     private val text = jdaEvent.messageReceivedEvent
+
+    /**
+     * Reply to user. (for Kotlin)
+     *
+     * @param messageCreate The message to send.
+     */
+    fun reply(
+        messageCreate: MessageCreateData
+    ) = when (jdaEvent.type) {
+        CommandMethodType.SlashCommand ->
+            slash!!.reply(messageCreate)
+                .toUnifiedReplyActionDispatcher()
+
+        CommandMethodType.TextCommand ->
+            text!!.message.reply(messageCreate)
+                .toUnifiedReplyActionDispatcher()
+    }
 
     /**
      * Reply to user. (for Kotlin)

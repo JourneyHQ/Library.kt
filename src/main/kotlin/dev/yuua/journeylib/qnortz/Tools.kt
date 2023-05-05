@@ -1,6 +1,5 @@
 package dev.yuua.journeylib.qnortz
 
-import net.dv8tion.jda.api.JDA
 import java.awt.Color
 
 fun code(context: String) = "`$context`"
