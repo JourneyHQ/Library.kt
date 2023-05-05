@@ -24,9 +24,10 @@ repositories {
 }
 
 dependencies {
+    implementation("junit:junit:4.13.1")
     testImplementation(kotlin("test"))
 
-    implementation("net.dv8tion:JDA:5.0.0-beta.1")
+    implementation("net.dv8tion:JDA:5.0.0-beta.6")
     implementation("com.github.minndevelopment:jda-ktx:9fc90f6")
 
     implementation("ch.qos.logback:logback-classic:1.4.4")
@@ -34,6 +35,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:3.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.4")
     implementation("org.reflections:reflections:0.10.2")
+    implementation(kotlin("reflect"))
 }
 
 tasks.test {
