@@ -8,14 +8,11 @@ on:
 
 jobs:
   Publish:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📞 Call Publish workflow
-        uses: JourneyHQ/Workflows/.github/workflows/maven-publish.yml@main
-        with:
-          emoji: ☕
-          reverse_dns: dev.yuua:librarykt
-          pre_release: ${{ github.ref_name == 'dev' }}
-          git_push_email: identity@yuua.dev
-          discord_webhook: ${{ secrets.discord_webhook }}
-          gh_registry_token: ${{ secrets.gh_registry_token }}
+    uses: JourneyHQ/Workflows/.github/workflows/maven-publish.yml@main
+    with:
+      emoji: ☕
+      reverse_dns: dev.yuua:librarykt
+      pre_release: ${{ github.ref_name == 'dev' }}
+      git_push_email: identity@yuua.dev
+      discord_webhook: ${{ secrets.discord_webhook }}
+      gh_registry_token: ${{ secrets.gh_registry_token }}
