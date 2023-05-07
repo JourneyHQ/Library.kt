@@ -14,5 +14,6 @@ jobs:
       reverse_dns: dev.yuua:librarykt
       pre_release: ${{ github.ref_name == 'dev' }}
       git_push_email: identity@yuua.dev
-      discord_webhook: ${{ secrets.discord_webhook }}
-      gh_registry_token: ${{ secrets.gh_registry_token }}
+    secrets:
+      discord_webhook: ${{ secrets.DISCORD_TOKEN }}
+      gh_registry_token: ${{ secrets.GH_REGISTRY_TOKEN }}
