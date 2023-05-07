@@ -1,1 +1,1 @@
-rootProject.name = "journeylib"
+rootProject.name = "library.kt"

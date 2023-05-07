@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.7.10"
+    kotlin("jvm") version "1.8.0"
     `maven-publish`
 }
 
@@ -28,7 +28,7 @@ dependencies {
     testImplementation(kotlin("test"))
 
     implementation("net.dv8tion:JDA:5.0.0-beta.6")
-    implementation("com.github.minndevelopment:jda-ktx:9fc90f6")
+    implementation("com.github.minndevelopment:jda-ktx:0.10.0-beta.1")
 
     implementation("ch.qos.logback:logback-classic:1.4.4")
     implementation("com.github.ajalt.mordant:mordant:2.0.0-beta5")
@@ -43,19 +43,19 @@ tasks.test {
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions.jvmTarget = "16"
+    kotlinOptions.jvmTarget = "17"
 }
 
 publishing {
     repositories {
         maven {
-            name = "JourneyLib"
+            name = "Library.kt"
             url = uri("file:/${project.projectDir}/artifacts")
         }
         if (System.getenv("platform") == "actions") {
             maven {
-                name = "JourneyLib"
-                url = uri("https://maven.pkg.github.com/yuuahp/JourneyLib")
+                name = "Library.kt"
+                url = uri("https://maven.pkg.github.com/JourneyHQ/Library.kt")
                 credentials {
                     username = System.getenv("project_user")
                     password = System.getenv("project_token")
@@ -65,7 +65,7 @@ publishing {
     }
     publications {
         register<MavenPublication>("gpr") {
-            artifactId = "journeylib"
+            artifactId = "librarykt"
             from(components["java"])
         }
     }
@@ -73,5 +73,5 @@ publishing {
 
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
-    languageVersion = "1.6"
+    languageVersion = "1.8"
 }
