@@ -8,7 +8,7 @@ on:
 
 jobs:
   Publish:
-    uses: JourneyHQ/Workflows/.github/workflows/maven-publish.yml@main
+    uses: JourneyHQ/Workflows/.github/workflows/gradle-publish.yml@main
     with:
       emoji: ☕
       reverse_dns: dev.yuua:librarykt
