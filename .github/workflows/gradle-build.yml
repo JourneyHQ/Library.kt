@@ -7,4 +7,5 @@ jobs:
     uses: JourneyHQ/Workflows/.github/workflows/gradle-build.yml@main
     with:
       emoji: ☕
+    secrets:
       DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
